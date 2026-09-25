@@ -1808,7 +1808,7 @@ VIEWS.pos = {
         items: c.items.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, qty: i.qty, addon_ids: i.addons.map(a => a.id), note: i.note })),
         discount: c.discount, payment: payAmt > 0 ? { amount: payAmt, method } : null
       };
-      const res = await rpc('create_order', payload);
+      const res = await rpc('create_order', { p: payload });
       Modal.close(w); toast(`${t('Order created')}: #${res.order_no}`);
       const o = await getOrder(res.id); S.cart = newCart(); this.render(); refreshView(); updateBadge();
       showReceipt(o, { newOrderBtn: true });

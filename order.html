@@ -1417,7 +1417,7 @@ function checkoutModal(calc) {
       customer: { name, phone, address: addr }, notes: $('#co-note', w).value.trim() || null,
       items: OS.cart.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, qty: i.qty, addon_ids: i.addons.map(a => a.id), note: i.note }))
     };
-    const res = await rpc('place_online_order', payload);
+    const res = await rpc('place_online_order', { p: payload });
     Modal.close(w); OS.cart = []; persist(); paintCart(); document.body.classList.remove('cart-open');
     OS.ref = uuid();
     Modal.open({
