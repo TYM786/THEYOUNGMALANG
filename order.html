@@ -368,7 +368,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
   .kds { grid-template-columns: repeat(4, 280px); }
   .stat.hero { grid-column: span 1; }
 }
-@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .tb-right select { display: none; } .view { padding: 10px; } }
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .view { padding: 10px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media print { .sidebar, .topbar, .btn, .no-print { display: none !important; } body { background: #fff; } .view { overflow: visible; } }
 
@@ -846,7 +846,13 @@ window.UR = {
  "Waiter": "ویٹر",
  "Serving": "سرو کر رہا",
  "Today's Orders": "آج کے آرڈرز",
- "Rider": "رائیڈر"
+ "Rider": "رائیڈر",
+ "Print ticket": "ٹکٹ پرنٹ کریں",
+ "Rider Slip": "رائیڈر سلپ",
+ "Auto-print kitchen + counter tickets": "کچن + کاؤنٹر ٹکٹ خودکار پرنٹ",
+ "On — print automatically on every new order": "آن — ہر نئے آرڈر پر خودکار پرنٹ ہو",
+ "Off — staff prints manually": "آف — اسٹاف خود پرنٹ کرے گا",
+ "Allow pop-ups to auto-print tickets": "ٹکٹ خودکار پرنٹ کے لیے پاپ اپ کی اجازت دیں"
 };
 
 
@@ -891,18 +897,25 @@ function setLang(l) {
   $$('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
   $$('[data-tp]').forEach(el => { el.placeholder = t(el.dataset.tp); });
   $$('.lang-btn').forEach(b => { b.textContent = l === 'ur' ? 'English' : 'اردو'; });
-  $$('select.theme-sel option').forEach(o => { o.textContent = t(o.dataset.en); });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(document.documentElement.dataset.theme || 'classic'); });
 }
 const pick = (o, k = 'name') => (LANG === 'ur' && o[k + '_ur']) || o[k];
 
 /* ---------- theme ---------- */
 const THEMES = [['classic', 'Classic'], ['dark', 'Dark'], ['sunny', 'Sunny']];
+const THEME_ICON = { classic: '☀️', dark: '🌙', sunny: '🌤️' };
+function themeLabel(x) { return `${THEME_ICON[x] || '🎨'} ${t((THEMES.find(a => a[0] === x) || [])[1] || 'Theme')}`; }
 function setTheme(x) {
   if (!THEMES.some(a => a[0] === x)) x = 'classic';
   document.documentElement.dataset.theme = x; localStorage.setItem('ym_theme', x);
-  $$('select.theme-sel').forEach(s => { s.value = x; });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(x); });
 }
-const themeSelect = id => `<select class="theme-sel" id="${id}" aria-label="Theme">${THEMES.map(([v, n]) => `<option value="${v}" data-en="${n}">${t(n)}</option>`).join('')}</select>`;
+function cycleTheme() {
+  const cur = document.documentElement.dataset.theme || 'classic';
+  const idx = THEMES.findIndex(a => a[0] === cur);
+  setTheme(THEMES[(idx + 1) % THEMES.length][0]);
+}
+const themeSelect = id => `<button type="button" class="btn ghost sm theme-btn" id="${id}" aria-label="Theme">${themeLabel(localStorage.getItem('ym_theme') || 'classic')}</button>`;
 
 /* ---------- labels ---------- */
 const SRC = { walkin: 'WALK-IN', dinein: 'DINE-IN', takeaway: 'TAKEAWAY', phone: 'PHONE', online: 'ONLINE', qr: 'QR' };
@@ -1042,7 +1055,7 @@ const Shell = {
     mountClock($('#login-clock'), 64);
     $('#lg-eye').onclick = () => { const i = $('#lg-pass'); i.type = i.type === 'password' ? 'text' : 'password'; };
     $('#lg-form').onsubmit = e => { e.preventDefault(); this.doLogin(); };
-    $('#lg-theme').onchange = e => setTheme(e.target.value);
+    $('#lg-theme').onclick = () => cycleTheme();
     $('#login .lang-btn').onclick = () => this.toggleLang();
     if (this.cfg.allowSignup) $('#lg-signup').onclick = () => this.signupFlow();
   },
@@ -1057,7 +1070,7 @@ const Shell = {
         <div class="tb-user"><span class="avatar" id="tb-av">?</span><div><b id="tb-name"></b><small id="tb-role"></small></div></div>
       </div>`;
     $('#btn-lang').onclick = () => this.toggleLang();
-    $('#sel-theme').onchange = e => setTheme(e.target.value);
+    $('#sel-theme').onclick = () => cycleTheme();
     $('#btn-menu').onclick = () => $('#app').classList.toggle('menu-open');
     setLang(LANG); setTheme(localStorage.getItem('ym_theme') || 'classic');
   },
@@ -1207,6 +1220,7 @@ const Receipt = {
     const row = (l, v) => `<tr><td>${l}</td><td class="r">${v}</td></tr>`;
     const sb = this.servedBy(o);
     return `<div class="rcpt-box"><img src="${BR.logo}" alt=""><h4>${esc(r.name || BR.name)}</h4>
+      ${(r.tagline || BR.tagline) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
       <div class="c">${esc(r.address || BR.address)}<br>${esc(phones)}${r.ntn ? `<br>NTN: ${esc(r.ntn)}` : ''}</div><hr>
       <table>${row('Order No', `<b>${esc(o.order_no)}</b>`)}${row('Receipt No', esc(o.receipt_no || '—'))}${row('Date', fmtDT(o.created_at))}${row('Type', `${SRC[o.source] || o.source} / ${FUL[o.fulfillment] || o.fulfillment}`)}
       ${o.tbl ? row('Table', esc(o.tbl.code)) : ''}${o.customer_name ? row('Customer', esc(o.customer_name)) : ''}${o.phone ? row('Phone', esc(o.phone)) : ''}
@@ -1224,9 +1238,9 @@ const Receipt = {
   doc(o, S, autoPrint, size = '80') {
     const sz = this.SIZES[size] || this.SIZES['80'];
     return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
-      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
-      .rcpt-box{max-width:${sz.max};margin:0 auto}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
-      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}
+      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+      .rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
+      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
       @page{size:${size === 'a4' ? 'A4' : sz.w + ' auto'};margin:${size === 'a4' ? '14mm' : '3mm'}}</style></head><body>${this.body(o, S)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
   },
   log(o, method) { rpc('log_receipt_print', { p_order: o.id, p_method: method }).catch(() => {}); },
@@ -1239,6 +1253,95 @@ const Receipt = {
     setTimeout(() => URL.revokeObjectURL(a.href), 2000); this.log(o, 'digital');
   }
 };
+
+/* ---------- KITCHEN TICKET — simple, big-print, no prices, no payment info ---------- */
+const KitchenTicket = {
+  body(o, batchOnly) {
+    const src = batchOnly ? (o.order_items || []).filter(i => i.batch === batchOnly) : (o.order_items || []);
+    const items = src.map(i => `<div class="ki"><b>${i.qty} × ${esc(i.name)}</b>${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<div class="add">+ ${i.addons.map(a => esc(a.name)).join(', ')}</div>` : ''}${i.note ? `<div class="note">“${esc(i.note)}”</div>` : ''}</div>`).join('');
+    return `<div class="kt-box"><h4>${batchOnly ? 'KITCHEN TICKET — ADDED ITEMS' : 'KITCHEN TICKET'}</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${SRC[o.source] || o.source}</span></div>
+      <div class="row2"><span>${FUL[o.fulfillment] || o.fulfillment}${o.tbl ? ' · Table ' + esc(o.tbl.code) : ''}</span><span>${fmtTime(o.created_at)}</span></div>
+      <hr>${items}<hr>
+      ${o.notes ? `<div class="note big">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, autoPrint, size = '58', batchOnly) {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Kitchen — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+      .add{font-size:12px;font-weight:600;color:#000}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+      .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, batchOnly)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, size = '58', batchOnly) {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, true, size, batchOnly)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'kitchen-ticket' }).catch(() => {});
+  }
+};
+
+/* ---------- RIDER SLIP — what the rider physically carries ---------- */
+const RiderSlip = {
+  body(o, rider) {
+    const items = (o.order_items || []).map(i => `<div class="ki">${i.qty} × ${esc(i.name)}${i.variant ? ` (${esc(i.variant)})` : ''}</div>`).join('');
+    const due = Math.max(0, num(o.total) - num(o.paid_amount));
+    return `<div class="kt-box"><h4>DELIVERY — RIDER COPY</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${fmtTime(o.created_at)}</span></div>
+      ${rider ? `<div class="c sm">Rider: ${esc(rider.name)} (${esc(rider.rider_code)})</div>` : ''}<hr>
+      <div class="ki big">👤 ${esc(o.customer_name || '')}</div>
+      <div class="ki">📞 ${esc(o.phone || '')}</div>
+      <div class="ki addr">📍 ${esc(o.address || '')}</div><hr>
+      ${items}<hr>
+      <div class="row2 total"><span>${o.payment_status === 'paid' ? 'PAID — nothing to collect' : 'COLLECT (COD)'}</span><span>${o.payment_status === 'paid' ? '' : money(due)}</span></div>
+      ${o.notes ? `<div class="note">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, rider, autoPrint, size = '58') {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Rider — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:15px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:13px;padding:2px 0}.ki.big{font-size:16px;font-weight:800}
+      .addr{font-weight:700}.c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      .total{font-size:16px;font-weight:900;border:2px solid #000;padding:5px}.note{font-weight:700;margin-top:4px}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, rider)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, rider, size = '58') {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, rider, true, size)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'rider-slip' }).catch(() => {});
+  }
+};
+
+/* ---------- combined auto-print at checkout: kitchen ticket + counter receipt ----------
+   Same printer -> one print job, two pages (page-break), one confirm.
+   Different printers -> caller can still print each separately from its own screen. */
+function autoPrintOrderTickets(o, S, batchOnly) {
+  const prefs = (S.kitchen || {});
+  if (prefs.auto_print === false) return; // staff can turn this off in Settings
+  const w = window.open('', '_blank', 'width=420,height=640');
+  if (!w) { toast(t('Allow pop-ups to auto-print tickets'), 'err'); return; }
+  const sz = Receipt.SIZES['58'];
+  const pages = batchOnly
+    ? `<div class="page">${KitchenTicket.body(o, batchOnly)}</div>`   // add-items: kitchen only, no need to reprint the counter receipt
+    : `<div class="page">${KitchenTicket.body(o)}</div><div class="page">${Receipt.body(o, S)}</div>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
+    body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+    .kt-box,.rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+    .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+    .add{font-size:12px;font-weight:600}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+    .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+    .rcpt-box img{height:56px;display:block;margin:0 auto 4px}table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}
+    td.r{text-align:right}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
+    .page{page-break-after:always;padding-bottom:10px}.page:last-child{page-break-after:auto}
+    @page{size:${sz.w} auto;margin:3mm}</style></head><body>
+    ${pages}
+    <script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>
+    </body></html>`;
+  w.document.write(html); w.document.close();
+  rpc('log_receipt_print', { p_order: o.id, p_method: batchOnly ? 'auto-kitchen-added' : 'auto-kitchen+counter' }).catch(() => {});
+}
 
 /* ---------- CSV / print helpers ---------- */
 function downloadCSV(name, cols, rows) {
@@ -1281,6 +1384,7 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-rate', 'Default rider rate per delivery (Rs.)', rd.default_rate ?? 100, 'number')}</div></div>` : ''}
     <div class="card"><h3>${t('Kitchen & Online')}</h3><div class="form-grid">
       <label class="f">${t('Kitchen alert sound')}<select id="s-ksnd"><option value="1" ${k.sound !== false ? 'selected' : ''}>${t('On')}</option><option value="0" ${k.sound === false ? 'selected' : ''}>${t('Off')}</option></select></label>
+      <label class="f">${t('Auto-print kitchen + counter tickets')}<select id="s-kauto"><option value="1" ${k.auto_print !== false ? 'selected' : ''}>${t('On — print automatically on every new order')}</option><option value="0" ${k.auto_print === false ? 'selected' : ''}>${t('Off — staff prints manually')}</option></select></label>
       <label class="f">${t('Website / QR ordering')}<select id="s-acc"><option value="1" ${o.accepting_orders !== false ? 'selected' : ''}>${t('Accepting orders')}</option><option value="0" ${o.accepting_orders === false ? 'selected' : ''}>${t('Paused')}</option></select></label></div></div>
     <button class="btn primary lg" id="s-save">${t('Save settings')}</button></div>`;
 }
@@ -1293,7 +1397,7 @@ async function saveSettingsForm(S, canPerm) {
     await saveSetting('permissions', { cashier_max_discount_pct: num(v('#s-disc')), cashier_can_cancel: v('#s-canc') === '1' });
     await saveSetting('rider', { default_rate: num(v('#s-rate')) });
   }
-  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1' });
+  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1', auto_print: v('#s-kauto') === '1' });
   await saveSetting('online', { accepting_orders: v('#s-acc') === '1' });
 }
 
@@ -1344,7 +1448,7 @@ function drawShell() {
     <button class="btn primary lg fab" id="site-fab">🛒 ${t('View Order')}</button>
     <div id="modal-root"></div><div id="toast-root"></div>`;
   $('#site-lang').onclick = () => { setLang(LANG === 'ur' ? 'en' : 'ur'); drawShell(); paintCats(); paintProds(); paintCart(); };
-  $('#site-theme').onchange = e => setTheme(e.target.value);
+  $('#site-theme').onclick = () => cycleTheme();
   $('#site-track').onclick = trackModal;
   $('#site-fab').onclick = () => document.body.classList.add('cart-open');
 }

@@ -247,6 +247,7 @@ body.ur .tot-row.grand { font-family: 'Noto Naskh Arabic', serif; }
 .cart-btns .btn { padding: 4px 4px; font-size: 12.5px; min-height: 38px; }
 .cart-toggle { display: none; }
 .banner { background: color-mix(in srgb, var(--info) 14%, transparent); border: 1.5px solid var(--info); color: var(--text); padding: 8px 10px; border-radius: 10px; font-weight: 600; font-size: 13px; }
+.danger-row td { background: color-mix(in srgb, var(--danger) 12%, transparent) !important; }
 
 /* ---------- order cards ---------- */
 .ogrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-items: start; }
@@ -368,11 +369,12 @@ table.tbl { width: 100%; border-collapse: collapse; }
   .kds { grid-template-columns: repeat(4, 280px); }
   .stat.hero { grid-column: span 1; }
 }
-@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .tb-right select { display: none; } .view { padding: 10px; } }
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .view { padding: 10px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media print { .sidebar, .topbar, .btn, .no-print { display: none !important; } body { background: #fff; } .view { overflow: visible; } }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <div id="login"></div>
@@ -541,6 +543,55 @@ window.UR = {
  "No items yet — tap a product to add it": "ابھی کوئی آئٹم نہیں — پروڈکٹ پر ٹیپ کریں",
  "Select table": "ٹیبل منتخب کریں",
  "Discount": "رعایت",
+ "Export Menu": "مینو ایکسپورٹ کریں",
+ "Import Menu (Excel)": "مینو امپورٹ کریں (ایکسل)",
+ "Could not read that file": "یہ فائل نہیں پڑھی جا سکی",
+ "No rows found in that file": "اس فائل میں کوئی ڈیٹا نہیں ملا",
+ "Could not find Name/Price columns in that file": "اس فائل میں نام/قیمت کالم نہیں ملے",
+ "Import Menu — Preview": "مینو امپورٹ — پیش نظارہ",
+ "Found": "ملے",
+ "products": "پراڈکٹس",
+ "new categories will be created": "نئی کیٹیگریز بنائی جائیں گی",
+ "Existing products with the same name in the same category will be skipped (not duplicated).": "اگر پراڈکٹ اسی کیٹیگری میں اسی نام سے پہلے سے موجود ہے تو اسے چھوڑ دیا جائے گا۔",
+ "Import": "امپورٹ کریں",
+ "Imported": "امپورٹ ہو گیا",
+ "skipped (already existed)": "چھوڑے گئے (پہلے سے موجود)",
+ "...and": "...اور",
+ "more": "مزید",
+ "Uncategorized": "بغیر کیٹیگری",
+ "Inventory": "انوینٹری",
+ "Reports": "رپورٹس",
+ "Daily": "روزانہ",
+ "Weekly": "ہفتہ وار",
+ "Monthly": "ماہانہ",
+ "Yearly": "سالانہ",
+ "From": "سے",
+ "To": "تک",
+ "Apply": "لاگو کریں",
+ "Export Excel": "ایکسل ایکسپورٹ",
+ "Total Orders": "کل آرڈرز",
+ "Completed": "مکمل",
+ "Cancelled/Rejected": "کینسل/مسترد",
+ "Cancelled": "کینسل",
+ "Net Sales (incl. imported)": "خالص سیل (امپورٹڈ سمیت)",
+ "Avg Order Value": "اوسط آرڈر ویلیو",
+ "Period": "مدت",
+ "Orders": "آرڈرز",
+ "Subtotal": "سب ٹوٹل",
+ "Service": "سروس چارج",
+ "Sales Total": "سیل ٹوٹل",
+ "Imported (old POS)": "امپورٹڈ (پرانا POS)",
+ "Grand Total": "کل ٹوٹل",
+ "Report": "رپورٹ",
+ "No data for this period": "اس مدت کے لیے کوئی ڈیٹا نہیں",
+ "Week of": "ہفتہ بتاریخ",
+ "Sales figures include only completed/delivered orders. Cancelled/rejected orders are shown as a separate count for reference.": "سیل کے اعداد و شمار میں صرف مکمل/ڈلیور شدہ آرڈرز شامل ہیں۔ کینسل/مسترد آرڈرز الگ سے صرف حوالے کے لیے دکھائے گئے ہیں۔",
+ "Stock Qty": "اسٹاک تعداد",
+ "Low Stock Alert Below": "کم اسٹاک الرٹ حد",
+ "Not tracked": "ٹریک نہیں ہو رہا",
+ "Leave stock qty empty for items you do not want to track (e.g. always-available menu items).": "جن آئٹمز کو ٹریک نہیں کرنا وہاں اسٹاک تعداد خالی چھوڑ دیں (مثلاً ہمیشہ دستیاب مینو آئٹمز)۔",
+ "Stock updated": "اسٹاک اپ ڈیٹ ہو گیا",
+ "Inventory tracking is not set up on the database yet. Ask your developer to create an \"inventory\" table (product_id, qty, low_stock_threshold) in Supabase — see the setup notes provided with this update.": "انوینٹری ٹریکنگ ابھی ڈیٹا بیس میں سیٹ اپ نہیں ہے۔ اپنے ڈویلپر سے Supabase میں \"inventory\" ٹیبل بنوائیں — تفصیلات اس اپڈیٹ کے ساتھ دیے گئے نوٹس میں ہیں۔",
  "Note": "نوٹ",
  "Clear": "صاف کریں",
  "Close": "بند کریں",
@@ -854,7 +905,13 @@ window.UR = {
  "Waiter": "ویٹر",
  "Serving": "سرو کر رہا",
  "Today's Orders": "آج کے آرڈرز",
- "Rider": "رائیڈر"
+ "Rider": "رائیڈر",
+ "Print ticket": "ٹکٹ پرنٹ کریں",
+ "Rider Slip": "رائیڈر سلپ",
+ "Auto-print kitchen + counter tickets": "کچن + کاؤنٹر ٹکٹ خودکار پرنٹ",
+ "On — print automatically on every new order": "آن — ہر نئے آرڈر پر خودکار پرنٹ ہو",
+ "Off — staff prints manually": "آف — اسٹاف خود پرنٹ کرے گا",
+ "Allow pop-ups to auto-print tickets": "ٹکٹ خودکار پرنٹ کے لیے پاپ اپ کی اجازت دیں"
 };
 
 
@@ -899,18 +956,25 @@ function setLang(l) {
   $$('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
   $$('[data-tp]').forEach(el => { el.placeholder = t(el.dataset.tp); });
   $$('.lang-btn').forEach(b => { b.textContent = l === 'ur' ? 'English' : 'اردو'; });
-  $$('select.theme-sel option').forEach(o => { o.textContent = t(o.dataset.en); });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(document.documentElement.dataset.theme || 'classic'); });
 }
 const pick = (o, k = 'name') => (LANG === 'ur' && o[k + '_ur']) || o[k];
 
 /* ---------- theme ---------- */
 const THEMES = [['classic', 'Classic'], ['dark', 'Dark'], ['sunny', 'Sunny']];
+const THEME_ICON = { classic: '☀️', dark: '🌙', sunny: '🌤️' };
+function themeLabel(x) { return `${THEME_ICON[x] || '🎨'} ${t((THEMES.find(a => a[0] === x) || [])[1] || 'Theme')}`; }
 function setTheme(x) {
   if (!THEMES.some(a => a[0] === x)) x = 'classic';
   document.documentElement.dataset.theme = x; localStorage.setItem('ym_theme', x);
-  $$('select.theme-sel').forEach(s => { s.value = x; });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(x); });
 }
-const themeSelect = id => `<select class="theme-sel" id="${id}" aria-label="Theme">${THEMES.map(([v, n]) => `<option value="${v}" data-en="${n}">${t(n)}</option>`).join('')}</select>`;
+function cycleTheme() {
+  const cur = document.documentElement.dataset.theme || 'classic';
+  const idx = THEMES.findIndex(a => a[0] === cur);
+  setTheme(THEMES[(idx + 1) % THEMES.length][0]);
+}
+const themeSelect = id => `<button type="button" class="btn ghost sm theme-btn" id="${id}" aria-label="Theme">${themeLabel(localStorage.getItem('ym_theme') || 'classic')}</button>`;
 
 /* ---------- labels ---------- */
 const SRC = { walkin: 'WALK-IN', dinein: 'DINE-IN', takeaway: 'TAKEAWAY', phone: 'PHONE', online: 'ONLINE', qr: 'QR' };
@@ -1050,7 +1114,7 @@ const Shell = {
     mountClock($('#login-clock'), 64);
     $('#lg-eye').onclick = () => { const i = $('#lg-pass'); i.type = i.type === 'password' ? 'text' : 'password'; };
     $('#lg-form').onsubmit = e => { e.preventDefault(); this.doLogin(); };
-    $('#lg-theme').onchange = e => setTheme(e.target.value);
+    $('#lg-theme').onclick = () => cycleTheme();
     $('#login .lang-btn').onclick = () => this.toggleLang();
     if (this.cfg.allowSignup) $('#lg-signup').onclick = () => this.signupFlow();
   },
@@ -1065,7 +1129,7 @@ const Shell = {
         <div class="tb-user"><span class="avatar" id="tb-av">?</span><div><b id="tb-name"></b><small id="tb-role"></small></div></div>
       </div>`;
     $('#btn-lang').onclick = () => this.toggleLang();
-    $('#sel-theme').onchange = e => setTheme(e.target.value);
+    $('#sel-theme').onclick = () => cycleTheme();
     $('#btn-menu').onclick = () => $('#app').classList.toggle('menu-open');
     setLang(LANG); setTheme(localStorage.getItem('ym_theme') || 'classic');
   },
@@ -1215,6 +1279,7 @@ const Receipt = {
     const row = (l, v) => `<tr><td>${l}</td><td class="r">${v}</td></tr>`;
     const sb = this.servedBy(o);
     return `<div class="rcpt-box"><img src="${BR.logo}" alt=""><h4>${esc(r.name || BR.name)}</h4>
+      ${(r.tagline || BR.tagline) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
       <div class="c">${esc(r.address || BR.address)}<br>${esc(phones)}${r.ntn ? `<br>NTN: ${esc(r.ntn)}` : ''}</div><hr>
       <table>${row('Order No', `<b>${esc(o.order_no)}</b>`)}${row('Receipt No', esc(o.receipt_no || '—'))}${row('Date', fmtDT(o.created_at))}${row('Type', `${SRC[o.source] || o.source} / ${FUL[o.fulfillment] || o.fulfillment}`)}
       ${o.tbl ? row('Table', esc(o.tbl.code)) : ''}${o.customer_name ? row('Customer', esc(o.customer_name)) : ''}${o.phone ? row('Phone', esc(o.phone)) : ''}
@@ -1232,9 +1297,9 @@ const Receipt = {
   doc(o, S, autoPrint, size = '80') {
     const sz = this.SIZES[size] || this.SIZES['80'];
     return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
-      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
-      .rcpt-box{max-width:${sz.max};margin:0 auto}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
-      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}
+      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+      .rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
+      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
       @page{size:${size === 'a4' ? 'A4' : sz.w + ' auto'};margin:${size === 'a4' ? '14mm' : '3mm'}}</style></head><body>${this.body(o, S)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
   },
   log(o, method) { rpc('log_receipt_print', { p_order: o.id, p_method: method }).catch(() => {}); },
@@ -1248,6 +1313,95 @@ const Receipt = {
   }
 };
 
+/* ---------- KITCHEN TICKET — simple, big-print, no prices, no payment info ---------- */
+const KitchenTicket = {
+  body(o, batchOnly) {
+    const src = batchOnly ? (o.order_items || []).filter(i => i.batch === batchOnly) : (o.order_items || []);
+    const items = src.map(i => `<div class="ki"><b>${i.qty} × ${esc(i.name)}</b>${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<div class="add">+ ${i.addons.map(a => esc(a.name)).join(', ')}</div>` : ''}${i.note ? `<div class="note">“${esc(i.note)}”</div>` : ''}</div>`).join('');
+    return `<div class="kt-box"><h4>${batchOnly ? 'KITCHEN TICKET — ADDED ITEMS' : 'KITCHEN TICKET'}</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${SRC[o.source] || o.source}</span></div>
+      <div class="row2"><span>${FUL[o.fulfillment] || o.fulfillment}${o.tbl ? ' · Table ' + esc(o.tbl.code) : ''}</span><span>${fmtTime(o.created_at)}</span></div>
+      <hr>${items}<hr>
+      ${o.notes ? `<div class="note big">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, autoPrint, size = '58', batchOnly) {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Kitchen — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+      .add{font-size:12px;font-weight:600;color:#000}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+      .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, batchOnly)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, size = '58', batchOnly) {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, true, size, batchOnly)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'kitchen-ticket' }).catch(() => {});
+  }
+};
+
+/* ---------- RIDER SLIP — what the rider physically carries ---------- */
+const RiderSlip = {
+  body(o, rider) {
+    const items = (o.order_items || []).map(i => `<div class="ki">${i.qty} × ${esc(i.name)}${i.variant ? ` (${esc(i.variant)})` : ''}</div>`).join('');
+    const due = Math.max(0, num(o.total) - num(o.paid_amount));
+    return `<div class="kt-box"><h4>DELIVERY — RIDER COPY</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${fmtTime(o.created_at)}</span></div>
+      ${rider ? `<div class="c sm">Rider: ${esc(rider.name)} (${esc(rider.rider_code)})</div>` : ''}<hr>
+      <div class="ki big">👤 ${esc(o.customer_name || '')}</div>
+      <div class="ki">📞 ${esc(o.phone || '')}</div>
+      <div class="ki addr">📍 ${esc(o.address || '')}</div><hr>
+      ${items}<hr>
+      <div class="row2 total"><span>${o.payment_status === 'paid' ? 'PAID — nothing to collect' : 'COLLECT (COD)'}</span><span>${o.payment_status === 'paid' ? '' : money(due)}</span></div>
+      ${o.notes ? `<div class="note">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, rider, autoPrint, size = '58') {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Rider — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:15px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:13px;padding:2px 0}.ki.big{font-size:16px;font-weight:800}
+      .addr{font-weight:700}.c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      .total{font-size:16px;font-weight:900;border:2px solid #000;padding:5px}.note{font-weight:700;margin-top:4px}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, rider)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, rider, size = '58') {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, rider, true, size)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'rider-slip' }).catch(() => {});
+  }
+};
+
+/* ---------- combined auto-print at checkout: kitchen ticket + counter receipt ----------
+   Same printer -> one print job, two pages (page-break), one confirm.
+   Different printers -> caller can still print each separately from its own screen. */
+function autoPrintOrderTickets(o, S, batchOnly) {
+  const prefs = (S.kitchen || {});
+  if (prefs.auto_print === false) return; // staff can turn this off in Settings
+  const w = window.open('', '_blank', 'width=420,height=640');
+  if (!w) { toast(t('Allow pop-ups to auto-print tickets'), 'err'); return; }
+  const sz = Receipt.SIZES['58'];
+  const pages = batchOnly
+    ? `<div class="page">${KitchenTicket.body(o, batchOnly)}</div>`   // add-items: kitchen only, no need to reprint the counter receipt
+    : `<div class="page">${KitchenTicket.body(o)}</div><div class="page">${Receipt.body(o, S)}</div>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
+    body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+    .kt-box,.rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+    .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+    .add{font-size:12px;font-weight:600}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+    .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+    .rcpt-box img{height:56px;display:block;margin:0 auto 4px}table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}
+    td.r{text-align:right}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
+    .page{page-break-after:always;padding-bottom:10px}.page:last-child{page-break-after:auto}
+    @page{size:${sz.w} auto;margin:3mm}</style></head><body>
+    ${pages}
+    <script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>
+    </body></html>`;
+  w.document.write(html); w.document.close();
+  rpc('log_receipt_print', { p_order: o.id, p_method: batchOnly ? 'auto-kitchen-added' : 'auto-kitchen+counter' }).catch(() => {});
+}
+
 /* ---------- CSV / print helpers ---------- */
 function downloadCSV(name, cols, rows) {
   const qt = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -1259,6 +1413,45 @@ function printHTML(title, html) {
   const w = window.open('', '_blank'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#000}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:5px 8px;text-align:left;font-size:13px}th{background:#eee}h2{margin:0 0 4px}.r{text-align:right}</style></head><body><h2>${esc(BR.name)}</h2><div>${esc(title)} — ${new Date().toLocaleString('en-GB')}</div><br>${html}<script>window.onload=function(){window.print()}<\/script></body></html>`);
   w.document.close();
+}
+/* ---------- generic Excel/CSV reader — used by every "Import from Excel" button ---------- */
+function parseCSV(text) {
+  text = text.replace(/^\ufeff/, '');
+  const rows = []; let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else field += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(field); field = ''; rows.push(row); row = []; }
+    else field += c;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.length > 1 || r[0] !== '');
+}
+function readSpreadsheet(file) {
+  return new Promise((resolve, reject) => {
+    const isCSV = /\.csv$/i.test(file.name);
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('read failed'));
+    if (isCSV) {
+      reader.onload = () => resolve(parseCSV(reader.result));
+      reader.readAsText(file);
+    } else {
+      reader.onload = () => {
+        try {
+          const wb = XLSX.read(reader.result, { type: 'array' });
+          const sheet = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+          resolve(rows);
+        } catch (e) { reject(e); }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
 }
 
 /* ---------- settings form (used by POS Settings and Admin Settings) ---------- */
@@ -1289,6 +1482,7 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-rate', 'Default rider rate per delivery (Rs.)', rd.default_rate ?? 100, 'number')}</div></div>` : ''}
     <div class="card"><h3>${t('Kitchen & Online')}</h3><div class="form-grid">
       <label class="f">${t('Kitchen alert sound')}<select id="s-ksnd"><option value="1" ${k.sound !== false ? 'selected' : ''}>${t('On')}</option><option value="0" ${k.sound === false ? 'selected' : ''}>${t('Off')}</option></select></label>
+      <label class="f">${t('Auto-print kitchen + counter tickets')}<select id="s-kauto"><option value="1" ${k.auto_print !== false ? 'selected' : ''}>${t('On — print automatically on every new order')}</option><option value="0" ${k.auto_print === false ? 'selected' : ''}>${t('Off — staff prints manually')}</option></select></label>
       <label class="f">${t('Website / QR ordering')}<select id="s-acc"><option value="1" ${o.accepting_orders !== false ? 'selected' : ''}>${t('Accepting orders')}</option><option value="0" ${o.accepting_orders === false ? 'selected' : ''}>${t('Paused')}</option></select></label></div></div>
     <button class="btn primary lg" id="s-save">${t('Save settings')}</button></div>`;
 }
@@ -1301,7 +1495,7 @@ async function saveSettingsForm(S, canPerm) {
     await saveSetting('permissions', { cashier_max_discount_pct: num(v('#s-disc')), cashier_can_cancel: v('#s-canc') === '1' });
     await saveSetting('rider', { default_rate: num(v('#s-rate')) });
   }
-  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1' });
+  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1', auto_print: v('#s-kauto') === '1' });
   await saveSetting('online', { accepting_orders: v('#s-acc') === '1' });
 }
 
@@ -1312,6 +1506,8 @@ async function saveSettingsForm(S, canPerm) {
 const A = { role: '', settings: {}, cats: [], products: [], variants: [], addons: [], incentives: [], view: '' };
 const ANAV = [
   ['menu', '🍽️', 'Menu & Categories'],
+  ['inventory', '📦', 'Inventory'],
+  ['reports', '📊', 'Reports'],
   ['tables', '🍽️', 'Tables'],
   ['riders', '🏍️', 'Riders & Incentives'],
   ['users', '👥', 'Users & Roles'],
@@ -1325,7 +1521,7 @@ Shell.init({
     await loadAll();
     buildSidebar();
     window.addEventListener('hashchange', route);
-    Live.start(['products', 'categories', 'product_variants', 'addons', 'riders', 'dining_tables', 'settings', 'profiles'], () => { debounce(refresh, 400)(); });
+    Live.start(['products', 'categories', 'product_variants', 'addons', 'riders', 'dining_tables', 'settings', 'profiles', 'inventory'], () => { debounce(refresh, 400)(); });
     route();
   },
   onLang: () => { buildSidebar(); route(true); }
@@ -1371,13 +1567,69 @@ VIEWS.menu = {
   cat: null,
   render() {
     this.cat = this.cat || (A.cats[0] && A.cats[0].id) || null;
-    $('#view').innerHTML = `<div class="view-head"><h2>${t('Menu & Categories')}</h2><button class="btn primary" id="mn-addcat">➕ ${t('Add Category')}</button></div>
+    $('#view').innerHTML = `<div class="view-head"><h2>${t('Menu & Categories')}</h2><button class="btn sm ghost" id="mn-import">⬆ ${t('Import Menu (Excel)')}</button><input type="file" id="mn-import-file" accept=".xlsx,.xls,.csv" class="hidden"><button class="btn sm ghost" id="mn-csv">⬇ ${t('Export Menu')}</button><button class="btn primary" id="mn-addcat">➕ ${t('Add Category')}</button></div>
       <div class="tabs" id="mn-cats"></div>
       <div class="view-head"><h3 style="margin-inline-end:auto">${t('Products')}</h3><button class="btn" id="mn-addprod">➕ ${t('Add Product')}</button></div>
       <div class="tbl-wrap"><table class="tbl" id="mn-prods"></table></div>`;
     this.paintCats(); this.paintProds();
     $('#mn-addcat').onclick = () => this.catModal();
     $('#mn-addprod').onclick = () => this.prodModal();
+    $('#mn-csv').onclick = () => {
+      const mcols = [{ label: 'Category', get: p => pick(A.cats.find(c => c.id === p.category_id) || {}) }, { label: 'Name', key: 'name' }, { label: 'Price', get: p => A.variants.some(v => v.product_id === p.id) ? 'Varies' : p.price }, { label: 'Sizes', get: p => A.variants.filter(v => v.product_id === p.id).map(v => `${pick(v)}:${v.price}`).join('; ') }, { label: 'Available', get: p => p.is_available ? 'Yes' : 'No' }];
+      downloadCSV('menu', mcols, A.products);
+    };
+    $('#mn-import').onclick = () => $('#mn-import-file').click();
+    $('#mn-import-file').onchange = e => { const f = e.target.files[0]; if (f) this.importMenuFile(f); e.target.value = ''; };
+  },
+  async importMenuFile(file) {
+    let sheetRows;
+    try { sheetRows = await readSpreadsheet(file); } catch (err) { return toast(t('Could not read that file'), 'err'); }
+    if (!sheetRows.length) return toast(t('No rows found in that file'), 'err');
+    const header = sheetRows[0].map(h => String(h || '').trim().toLowerCase());
+    const findCol = aliases => header.findIndex(h => aliases.includes(h));
+    const cCat = findCol(['category', 'categories', 'cat']);
+    const cName = findCol(['name', 'item', 'product', 'item name', 'product name']);
+    const cNameUr = findCol(['name_ur', 'urdu', 'urdu name', 'name (urdu)']);
+    const cPrice = findCol(['price', 'rate', 'amount', 'base price']);
+    const cSizes = findCol(['sizes', 'variants', 'size']);
+    if (cName < 0 || cPrice < 0) return toast(t('Could not find Name/Price columns in that file'), 'err');
+    const dataRows = sheetRows.slice(1).filter(r => r[cName] && String(r[cName]).trim());
+    const rows = dataRows.map(r => ({
+      category: cCat >= 0 ? String(r[cCat] || '').trim() : t('Uncategorized'),
+      name: String(r[cName]).trim(),
+      name_ur: cNameUr >= 0 ? String(r[cNameUr] || '').trim() : '',
+      price: num(cPrice >= 0 ? r[cPrice] : 0),
+      sizes: cSizes >= 0 ? String(r[cSizes] || '').trim() : ''
+    }));
+    const newCats = [...new Set(rows.map(r => r.category || t('Uncategorized')))].filter(c => !A.cats.some(ac => pick(ac).toLowerCase() === c.toLowerCase()));
+    Modal.open({
+      title: t('Import Menu — Preview'), wide: true, html: `
+      <p>${t('Found')} <b>${rows.length}</b> ${t('products')}${newCats.length ? `, ${newCats.length} ${t('new categories will be created')}: ${newCats.map(esc).join(', ')}` : ''}.</p>
+      <div class="tbl-wrap" style="max-height:300px;overflow:auto"><table class="tbl"><thead><tr><th>${t('Category')}</th><th>${t('Name')}</th><th>${t('Price')}</th><th>${t('Sizes')}</th></tr></thead>
+      <tbody>${rows.slice(0, 50).map(r => `<tr><td>${esc(r.category)}</td><td>${esc(r.name)}</td><td>${r.price}</td><td>${esc(r.sizes)}</td></tr>`).join('')}</tbody></table></div>
+      ${rows.length > 50 ? `<p class="sm muted">${t('...and')} ${rows.length - 50} ${t('more')}</p>` : ''}
+      <p class="sm muted">${t('Existing products with the same name in the same category will be skipped (not duplicated).')}</p>
+      <button class="btn primary lg" id="mi-go">${t('Import')} ${rows.length} ${t('products')}</button>`
+    });
+    $('#mi-go').onclick = ev => safe(async () => {
+      let created = 0, skipped = 0;
+      for (const catName of newCats) { await q(sb.from('categories').insert({ name: catName, sort: A.cats.length + 1 })); }
+      const cats = await q(sb.from('categories').select('*'));
+      for (const r of rows) {
+        const cat = cats.find(c => pick(c).toLowerCase() === (r.category || t('Uncategorized')).toLowerCase()) || cats[0];
+        const exists = A.products.some(p => p.category_id === cat.id && pick(p).toLowerCase() === r.name.toLowerCase());
+        if (exists) { skipped++; continue; }
+        const [row] = await q(sb.from('products').insert({ category_id: cat.id, name: r.name, name_ur: r.name_ur || null, price: r.price, sort: 1 }).select());
+        if (r.sizes) {
+          const sizeParts = r.sizes.split(/[;,]/).map(s => s.trim()).filter(Boolean).map((s, i) => {
+            const m = s.match(/^(.*?):\s*([\d.]+)$/); return m ? { name: m[1].trim(), price: num(m[2]), sort: i } : null;
+          }).filter(Boolean);
+          if (sizeParts.length) await q(sb.from('product_variants').insert(sizeParts.map(v => ({ product_id: row.id, ...v }))));
+        }
+        created++;
+      }
+      Modal.closeAll(); toast(`${t('Imported')}: ${created}${skipped ? `, ${t('skipped (already existed)')}: ${skipped}` : ''}`); refresh();
+    }, { busy: ev.currentTarget });
   },
   paintCats() {
     $('#mn-cats').innerHTML = A.cats.map(c => `<button class="tab ${c.id === this.cat ? 'on' : ''}" data-c="${c.id}">${catEmoji(c.name)} ${esc(pick(c))} <span class="n">${A.products.filter(p => p.category_id === c.id).length}</span></button>`).join('') + `<button class="tab ghost" id="mn-editcat">✎ ${t('Edit')}</button>`;
@@ -1492,6 +1744,104 @@ VIEWS.menu.addonModal = function (a) {
   if (a) $('#a-del', w).onclick = () => safe(async () => { if (!await confirmBox(t('Delete this add-on?'), { danger: true })) return; await q(sb.from('addons').delete().eq('id', a.id)); Modal.close(w); toast(t('Deleted')); refresh(); });
 };
 
+/* ---------- INVENTORY ---------- */
+VIEWS.inventory = {
+  async render() {
+    $('#view').innerHTML = `<div class="view-head"><h2>${t('Inventory')}</h2><button class="btn sm ghost" id="inv-csv">⬇ ${t('Export')}</button></div><div id="inv-body"></div>`;
+    try {
+      const stock = await q(sb.from('inventory').select('*'));
+      const byProd = {}; stock.forEach(s => byProd[s.product_id] = s);
+      const rows = A.products.map(p => ({ p, s: byProd[p.id] || { product_id: p.id, qty: null, low_stock_threshold: 5 } }));
+      $('#inv-body').innerHTML = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>${t('Product')}</th><th>${t('Category')}</th><th>${t('Stock Qty')}</th><th>${t('Low Stock Alert Below')}</th><th></th></tr></thead>
+        <tbody>${rows.map(({ p, s }) => `<tr class="${s.qty !== null && s.qty <= s.low_stock_threshold ? 'danger-row' : ''}"><td>${esc(pick(p))}</td><td>${esc(pick(A.cats.find(c => c.id === p.category_id) || {}))}</td>
+        <td><input type="number" min="0" data-invqty="${p.id}" value="${s.qty ?? ''}" placeholder="${t('Not tracked')}" style="width:90px"></td>
+        <td><input type="number" min="0" data-invlow="${p.id}" value="${s.low_stock_threshold ?? 5}" style="width:80px"></td>
+        <td><button class="btn sm ghost" data-invsave="${p.id}">${t('Save')}</button></td></tr>`).join('') || `<tr><td colspan="5" class="center muted">${t('No products yet')}</td></tr>`}</tbody></table></div>
+        <p class="sm muted mt">${t('Leave stock qty empty for items you do not want to track (e.g. always-available menu items).')}</p>`;
+      $$('[data-invsave]').forEach(b => b.onclick = () => safe(async () => {
+        const pid = +b.dataset.invsave;
+        const qtyEl = $(`[data-invqty="${pid}"]`), lowEl = $(`[data-invlow="${pid}"]`);
+        const qty = qtyEl.value === '' ? null : num(qtyEl.value), low = num(lowEl.value) || 0;
+        await q(sb.from('inventory').upsert({ product_id: pid, qty, low_stock_threshold: low }, { onConflict: 'product_id' }));
+        toast(t('Stock updated')); this.render();
+      }, { busy: b }));
+      $('#inv-csv').onclick = () => downloadCSV('inventory', [{ label: 'Product', get: r => pick(r.p) }, { label: 'Category', get: r => pick(A.cats.find(c => c.id === r.p.category_id) || {}) }, { label: 'Stock Qty', get: r => r.s.qty ?? '' }, { label: 'Low Stock Alert', get: r => r.s.low_stock_threshold }], rows);
+    } catch (e) {
+      $('#inv-body').innerHTML = `<div class="banner">${t('Inventory tracking is not set up on the database yet. Ask your developer to create an "inventory" table (product_id, qty, low_stock_threshold) in Supabase — see the setup notes provided with this update.')}</div>`;
+    }
+  }
+};
+
+/* ---------- REPORTS (overall — daily/weekly/monthly/yearly) ---------- */
+VIEWS.reports = {
+  period: 'daily', from: null, to: null,
+  async render() {
+    if (!this.from) { this.to = isoDate(new Date()); this.from = isoDate(addDays(new Date(), -30)); }
+    $('#view').innerHTML = `<div class="view-head"><h2>${t('Reports')}</h2></div>
+      <div class="row wrap gap6 mb">
+        <select id="rp-period">
+          <option value="daily">${t('Daily')}</option><option value="weekly">${t('Weekly')}</option>
+          <option value="monthly">${t('Monthly')}</option><option value="yearly">${t('Yearly')}</option>
+        </select>
+        <label class="sm">${t('From')} <input type="date" id="rp-from" value="${this.from}"></label>
+        <label class="sm">${t('To')} <input type="date" id="rp-to" value="${this.to}"></label>
+        <button class="btn sm primary" id="rp-go">${t('Apply')}</button>
+        <button class="btn sm ghost" id="rp-print">🖨 ${t('Print')}</button>
+        <button class="btn sm ghost" id="rp-csv">⬇ ${t('Export Excel')}</button>
+      </div>
+      <div class="stats mb" id="rp-stats"></div>
+      <div class="tbl-wrap"><table class="tbl" id="rp-tbl"></table></div>
+      <p class="sm muted mt">${t('Sales figures include only completed/delivered orders. Cancelled/rejected orders are shown as a separate count for reference.')}</p>`;
+    $('#rp-period').value = this.period;
+    $('#rp-go').onclick = () => { this.period = $('#rp-period').value; this.from = $('#rp-from').value; this.to = $('#rp-to').value; this.load(); };
+    this.load();
+  },
+  refresh() { this.load(); },
+  keyFor(d) {
+    const dt = new Date(d);
+    if (this.period === 'daily') return isoDate(dt);
+    if (this.period === 'weekly') { const wk = new Date(dt); wk.setDate(wk.getDate() - wk.getDay()); return isoDate(wk); }
+    if (this.period === 'monthly') return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+    return `${dt.getFullYear()}`;
+  },
+  labelFor(k) {
+    if (this.period === 'weekly') return `${t('Week of')} ${k}`;
+    if (this.period === 'monthly') { const [y, m] = k.split('-'); return new Date(+y, +m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }); }
+    return k;
+  },
+  async load() {
+    const tbl = $('#rp-tbl'); tbl.innerHTML = `<tr><td>${t('Loading')}…</td></tr>`;
+    const toExclusive = isoDate(addDays(new Date(this.to), 1));
+    const orders = await q(sb.from('orders').select('status,total,subtotal,discount,delivery_fee,tax,service_charge,created_at').gte('created_at', this.from).lt('created_at', toExclusive));
+    let historical = []; try { historical = await q(sb.from('historical_sales').select('*').gte('sale_date', this.from).lte('sale_date', this.to)); } catch (e) {}
+    const blank = () => ({ orders: 0, completed: 0, cancelled: 0, subtotal: 0, discount: 0, delivery: 0, tax: 0, service: 0, total: 0, imported: 0 });
+    const groups = {};
+    orders.forEach(o => {
+      const k = this.keyFor(o.created_at); groups[k] = groups[k] || blank(); groups[k].orders++;
+      if (['completed', 'delivered'].includes(o.status)) { const g = groups[k]; g.completed++; g.subtotal += num(o.subtotal); g.discount += num(o.discount); g.delivery += num(o.delivery_fee); g.tax += num(o.tax); g.service += num(o.service_charge); g.total += num(o.total); }
+      else if (['cancelled', 'rejected'].includes(o.status)) groups[k].cancelled++;
+    });
+    historical.forEach(h => { const k = this.keyFor(h.sale_date); groups[k] = groups[k] || blank(); groups[k].imported += num(h.amount); });
+    const rows = Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0])).map(([k, v]) => ({ period: this.labelFor(k), ...v, grand: v.total + v.imported }));
+    const sum = f => rows.reduce((s, r) => s + f(r), 0);
+    $('#rp-stats').innerHTML = `
+      <div class="stat"><div class="l">${t('Total Orders')}</div><div class="v">${sum(r => r.orders)}</div></div>
+      <div class="stat"><div class="l">${t('Completed')}</div><div class="v">${sum(r => r.completed)}</div></div>
+      <div class="stat"><div class="l">${t('Cancelled/Rejected')}</div><div class="v">${sum(r => r.cancelled)}</div></div>
+      <div class="stat hero"><div class="l">${t('Net Sales (incl. imported)')}</div><div class="v">${money(sum(r => r.grand))}</div></div>
+      <div class="stat"><div class="l">${t('Avg Order Value')}</div><div class="v">${money(sum(r => r.completed) ? sum(r => r.total) / sum(r => r.completed) : 0)}</div></div>`;
+    const head = `<thead><tr><th>${t('Period')}</th><th>${t('Orders')}</th><th>${t('Completed')}</th><th>${t('Cancelled')}</th><th>${t('Subtotal')}</th><th>${t('Discount')}</th><th>${t('Delivery')}</th><th>${t('Tax')}</th><th>${t('Service')}</th><th>${t('Sales Total')}</th><th>${t('Imported (old POS)')}</th><th>${t('Grand Total')}</th></tr></thead>`;
+    const body = rows.map(r => `<tr><td>${esc(r.period)}</td><td>${r.orders}</td><td>${r.completed}</td><td>${r.cancelled}</td><td>${money(r.subtotal)}</td><td>${money(r.discount)}</td><td>${money(r.delivery)}</td><td>${money(r.tax)}</td><td>${money(r.service)}</td><td>${money(r.total)}</td><td>${r.imported ? money(r.imported) : '—'}</td><td><b>${money(r.grand)}</b></td></tr>`).join('') || `<tr><td colspan="12" class="center muted">${t('No data for this period')}</td></tr>`;
+    const footRow = `<tr class="t"><td>${t('Grand Total')}</td><td>${sum(r => r.orders)}</td><td>${sum(r => r.completed)}</td><td>${sum(r => r.cancelled)}</td><td>${money(sum(r => r.subtotal))}</td><td>${money(sum(r => r.discount))}</td><td>${money(sum(r => r.delivery))}</td><td>${money(sum(r => r.tax))}</td><td>${money(sum(r => r.service))}</td><td>${money(sum(r => r.total))}</td><td>${money(sum(r => r.imported))}</td><td><b>${money(sum(r => r.grand))}</b></td></tr>`;
+    const tableHTML = `<table class="tbl">${head}<tbody>${body}${footRow}</tbody></table>`;
+    tbl.outerHTML = `<div class="tbl-wrap">${tableHTML}</div>`;
+    $('#rp-print').onclick = () => printHTML(t('Report') + ` (${t(this.period)}) ${this.from} → ${this.to}`, tableHTML);
+    $('#rp-csv').onclick = () => downloadCSV(`report_${this.period}_${this.from}_to_${this.to}`,
+      [{ label: 'Period', key: 'period' }, { label: 'Orders', key: 'orders' }, { label: 'Completed', key: 'completed' }, { label: 'Cancelled', key: 'cancelled' }, { label: 'Subtotal', key: 'subtotal' }, { label: 'Discount', key: 'discount' }, { label: 'Delivery', key: 'delivery' }, { label: 'Tax', key: 'tax' }, { label: 'Service', key: 'service' }, { label: 'Sales Total', key: 'total' }, { label: 'Imported (old POS)', key: 'imported' }, { label: 'Grand Total', key: 'grand' }],
+      rows);
+  }
+};
+
 /* ---------- TABLES ---------- */
 VIEWS.tables = {
   render() {
@@ -1587,13 +1937,14 @@ const RSTATUSA = { available: 'Available', on_delivery: 'On Delivery', offline: 
 VIEWS.users = {
   async render() {
     const users = await q(sb.from('profiles').select('*').order('created_at'));
-    $('#view').innerHTML = `<div class="view-head"><h2>${t('Users & Roles')}</h2></div>
+    $('#view').innerHTML = `<div class="view-head"><h2>${t('Users & Roles')}</h2><button class="btn sm ghost" id="us-csv">⬇ ${t('Export')}</button></div>
       <div class="banner mb">${t('New staff create their own login from the POS login screen ("New staff — create account"). Activate them and set their role here.')}</div>
       <div class="tbl-wrap"><table class="tbl"><thead><tr><th>${t('Name')}</th><th>${t('Username')}</th><th>${t('Role')}</th><th>${t('Active')}</th><th></th></tr></thead>
       <tbody>${users.map(u => `<tr><td>${esc(u.full_name)}</td><td>${esc(u.username)}</td>
         <td><select data-urole="${u.id}" ${u.role === 'super_admin' && u.id === Shell.profile.id ? 'disabled' : ''}>${Object.keys(ROLE_LABEL).map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${t(ROLE_LABEL[r])}</option>`).join('')}</select></td>
         <td><label class="row sm"><input type="checkbox" data-uactive="${u.id}" ${u.is_active ? 'checked' : ''} ${u.id === Shell.profile.id ? 'disabled' : ''}> ${t('Active')}</label></td>
         <td><button class="btn sm ghost" data-upass="${u.id}">${t('Set Password')}</button></td></tr>`).join('')}</tbody></table></div>`;
+    $('#us-csv').onclick = () => downloadCSV('staff', [{ label: 'Name', key: 'full_name' }, { label: 'Username', key: 'username' }, { label: 'Role', get: u => t(ROLE_LABEL[u.role] || u.role) }, { label: 'Active', get: u => u.is_active ? 'Yes' : 'No' }], users);
     $$('[data-urole]').forEach(s => s.onchange = () => safe(() => q(sb.from('profiles').update({ role: s.value }).eq('id', s.dataset.urole))));
     $$('[data-uactive]').forEach(cb => cb.onchange = () => safe(() => q(sb.from('profiles').update({ is_active: cb.checked }).eq('id', cb.dataset.uactive))));
     $$('[data-upass]').forEach(b => b.onclick = () => safe(async () => { const p = await askText(t('Set Password'), t('New password / PIN (min 6 chars)'), { type: 'password' }); if (!p) return; await rpc('admin_set_password', { p_user: b.dataset.upass, p_password: p }); toast(t('Password updated')); }));

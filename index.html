@@ -368,11 +368,12 @@ table.tbl { width: 100%; border-collapse: collapse; }
   .kds { grid-template-columns: repeat(4, 280px); }
   .stat.hero { grid-column: span 1; }
 }
-@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .tb-right select { display: none; } .view { padding: 10px; } }
+@media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } .topbar { padding: 6px 10px; } .view { padding: 10px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 @media print { .sidebar, .topbar, .btn, .no-print { display: none !important; } body { background: #fff; } .view { overflow: visible; } }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <div id="login"></div>
@@ -541,6 +542,52 @@ window.UR = {
  "No items yet — tap a product to add it": "ابھی کوئی آئٹم نہیں — پروڈکٹ پر ٹیپ کریں",
  "Select table": "ٹیبل منتخب کریں",
  "Discount": "رعایت",
+ "Delete permanently (fake entry)": "مستقل طور پر حذف کریں (فرضی اندراج)",
+ "Permanently delete this cancelled/rejected order? This cannot be undone and is meant only for fake/test entries.": "کیا اس کینسل/مسترد شدہ آرڈر کو مستقل طور پر حذف کرنا ہے؟ یہ واپس نہیں ہو سکتا اور صرف فرضی/ٹیسٹ اندراجات کے لیے ہے۔",
+ "Delete Permanently": "مستقل حذف کریں",
+ "Order deleted": "آرڈر حذف ہو گیا",
+ "Import Customers (Excel)": "کسٹمرز امپورٹ کریں (ایکسل)",
+ "Could not read that file": "یہ فائل نہیں پڑھی جا سکی",
+ "No rows found in that file": "اس فائل میں کوئی ڈیٹا نہیں ملا",
+ "Could not find a Phone column in that file": "اس فائل میں فون نمبر کالم نہیں ملا",
+ "Import Customers — Preview": "کسٹمرز امپورٹ — پیش نظارہ",
+ "Found": "ملے",
+ "customers": "کسٹمرز",
+ "An existing customer with the same phone number will be updated, not duplicated.": "اگر فون نمبر پہلے سے موجود ہے تو اسے اپڈیٹ کر دیا جائے گا، دوبارہ شامل نہیں ہوگا۔",
+ "Import": "امپورٹ کریں",
+ "Imported": "امپورٹ ہو گیا",
+ "new": "نئے",
+ "updated": "اپڈیٹ ہوئے",
+ "...and": "...اور",
+ "more": "مزید",
+ "View old backup file": "پرانی بیک اپ فائل دیکھیں",
+ "Edit": "ترمیم کریں",
+ "Import Old Sales Totals": "پرانی سیلز ٹوٹل امپورٹ کریں",
+ "Could not find Date/Amount columns in that file": "اس فائل میں تاریخ/رقم کالم نہیں ملے",
+ "No valid rows to import": "امپورٹ کے لیے کوئی درست ڈیٹا نہیں ملا",
+ "Import Old Sales Totals — Preview": "پرانی سیلز ٹوٹل امپورٹ — پیش نظارہ",
+ "days": "دن",
+ "total": "کل",
+ "These amounts will be added to your reports as \"Imported (old POS)\" so your annual/audit totals stay complete — they will not create individual orders.": "یہ رقمیں آپ کی رپورٹس میں \"پرانا POS\" کے طور پر شامل ہوں گی تاکہ سالانہ/آڈٹ ٹوٹل مکمل رہے — یہ الگ سے کوئی نیا آرڈر نہیں بنائیں گی۔",
+ "Old sales totals imported": "پرانی سیلز ٹوٹل امپورٹ ہو گئیں",
+ "Your database is not set up for this yet — ask your developer to add the historical_sales table (see backend-changes-needed.sql)": "آپ کا ڈیٹا بیس ابھی اس کے لیے تیار نہیں — اپنے ڈویلپر سے historical_sales ٹیبل بنوائیں (backend-changes-needed.sql دیکھیں)",
+ "Grand Total (period)": "کل ٹوٹل (اس مدت کا)",
+ "includes imported old-POS totals — for audit": "پرانے POS کی امپورٹڈ ٹوٹل شامل ہیں — آڈٹ کے لیے",
+ "Imported (old POS)": "امپورٹڈ (پرانا POS)",
+ "Could not read that file": "یہ فائل نہیں پڑھی جا سکی",
+ "Old backup": "پرانا بیک اپ",
+ "This is a read-only view of the file you exported earlier — it is not written back into the live system.": "یہ اس فائل کا صرف دیکھنے والا ورژن ہے جو آپ نے پہلے ایکسپورٹ کی تھی — یہ لائیو سسٹم میں دوبارہ شامل نہیں ہوتی۔",
+ "Last 90 days": "پچھلے 90 دن",
+ "Last 1 year": "پچھلا 1 سال",
+ "Last 3 years": "پچھلے 3 سال",
+ "All time": "تمام وقت",
+ "Delivery Charges": "ڈیلیوری چارجز",
+ "Delivery amount (Rs.)": "ڈیلیوری رقم (روپے)",
+ "Delivery charges vary by area/distance — enter the correct amount for this order.": "ڈیلیوری چارجز علاقے/فاصلے کے مطابق مختلف ہوتے ہیں — اس آرڈر کے لیے درست رقم درج کریں۔",
+ "Use default": "ڈیفالٹ استعمال کریں",
+ "Remove item": "آئٹم ہٹائیں",
+ "Remove this item from the order?": "کیا اس آئٹم کو آرڈر سے ہٹانا ہے؟",
+ "Item removed": "آئٹم ہٹا دیا گیا",
  "Note": "نوٹ",
  "Clear": "صاف کریں",
  "Close": "بند کریں",
@@ -854,7 +901,13 @@ window.UR = {
  "Waiter": "ویٹر",
  "Serving": "سرو کر رہا",
  "Today's Orders": "آج کے آرڈرز",
- "Rider": "رائیڈر"
+ "Rider": "رائیڈر",
+ "Print ticket": "ٹکٹ پرنٹ کریں",
+ "Rider Slip": "رائیڈر سلپ",
+ "Auto-print kitchen + counter tickets": "کچن + کاؤنٹر ٹکٹ خودکار پرنٹ",
+ "On — print automatically on every new order": "آن — ہر نئے آرڈر پر خودکار پرنٹ ہو",
+ "Off — staff prints manually": "آف — اسٹاف خود پرنٹ کرے گا",
+ "Allow pop-ups to auto-print tickets": "ٹکٹ خودکار پرنٹ کے لیے پاپ اپ کی اجازت دیں"
 };
 
 
@@ -899,18 +952,25 @@ function setLang(l) {
   $$('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
   $$('[data-tp]').forEach(el => { el.placeholder = t(el.dataset.tp); });
   $$('.lang-btn').forEach(b => { b.textContent = l === 'ur' ? 'English' : 'اردو'; });
-  $$('select.theme-sel option').forEach(o => { o.textContent = t(o.dataset.en); });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(document.documentElement.dataset.theme || 'classic'); });
 }
 const pick = (o, k = 'name') => (LANG === 'ur' && o[k + '_ur']) || o[k];
 
 /* ---------- theme ---------- */
 const THEMES = [['classic', 'Classic'], ['dark', 'Dark'], ['sunny', 'Sunny']];
+const THEME_ICON = { classic: '☀️', dark: '🌙', sunny: '🌤️' };
+function themeLabel(x) { return `${THEME_ICON[x] || '🎨'} ${t((THEMES.find(a => a[0] === x) || [])[1] || 'Theme')}`; }
 function setTheme(x) {
   if (!THEMES.some(a => a[0] === x)) x = 'classic';
   document.documentElement.dataset.theme = x; localStorage.setItem('ym_theme', x);
-  $$('select.theme-sel').forEach(s => { s.value = x; });
+  $$('.theme-btn').forEach(b => { b.textContent = themeLabel(x); });
 }
-const themeSelect = id => `<select class="theme-sel" id="${id}" aria-label="Theme">${THEMES.map(([v, n]) => `<option value="${v}" data-en="${n}">${t(n)}</option>`).join('')}</select>`;
+function cycleTheme() {
+  const cur = document.documentElement.dataset.theme || 'classic';
+  const idx = THEMES.findIndex(a => a[0] === cur);
+  setTheme(THEMES[(idx + 1) % THEMES.length][0]);
+}
+const themeSelect = id => `<button type="button" class="btn ghost sm theme-btn" id="${id}" aria-label="Theme">${themeLabel(localStorage.getItem('ym_theme') || 'classic')}</button>`;
 
 /* ---------- labels ---------- */
 const SRC = { walkin: 'WALK-IN', dinein: 'DINE-IN', takeaway: 'TAKEAWAY', phone: 'PHONE', online: 'ONLINE', qr: 'QR' };
@@ -1050,7 +1110,7 @@ const Shell = {
     mountClock($('#login-clock'), 64);
     $('#lg-eye').onclick = () => { const i = $('#lg-pass'); i.type = i.type === 'password' ? 'text' : 'password'; };
     $('#lg-form').onsubmit = e => { e.preventDefault(); this.doLogin(); };
-    $('#lg-theme').onchange = e => setTheme(e.target.value);
+    $('#lg-theme').onclick = () => cycleTheme();
     $('#login .lang-btn').onclick = () => this.toggleLang();
     if (this.cfg.allowSignup) $('#lg-signup').onclick = () => this.signupFlow();
   },
@@ -1065,7 +1125,7 @@ const Shell = {
         <div class="tb-user"><span class="avatar" id="tb-av">?</span><div><b id="tb-name"></b><small id="tb-role"></small></div></div>
       </div>`;
     $('#btn-lang').onclick = () => this.toggleLang();
-    $('#sel-theme').onchange = e => setTheme(e.target.value);
+    $('#sel-theme').onclick = () => cycleTheme();
     $('#btn-menu').onclick = () => $('#app').classList.toggle('menu-open');
     setLang(LANG); setTheme(localStorage.getItem('ym_theme') || 'classic');
   },
@@ -1215,6 +1275,7 @@ const Receipt = {
     const row = (l, v) => `<tr><td>${l}</td><td class="r">${v}</td></tr>`;
     const sb = this.servedBy(o);
     return `<div class="rcpt-box"><img src="${BR.logo}" alt=""><h4>${esc(r.name || BR.name)}</h4>
+      ${(r.tagline || BR.tagline) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
       <div class="c">${esc(r.address || BR.address)}<br>${esc(phones)}${r.ntn ? `<br>NTN: ${esc(r.ntn)}` : ''}</div><hr>
       <table>${row('Order No', `<b>${esc(o.order_no)}</b>`)}${row('Receipt No', esc(o.receipt_no || '—'))}${row('Date', fmtDT(o.created_at))}${row('Type', `${SRC[o.source] || o.source} / ${FUL[o.fulfillment] || o.fulfillment}`)}
       ${o.tbl ? row('Table', esc(o.tbl.code)) : ''}${o.customer_name ? row('Customer', esc(o.customer_name)) : ''}${o.phone ? row('Phone', esc(o.phone)) : ''}
@@ -1232,9 +1293,9 @@ const Receipt = {
   doc(o, S, autoPrint, size = '80') {
     const sz = this.SIZES[size] || this.SIZES['80'];
     return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
-      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
-      .rcpt-box{max-width:${sz.max};margin:0 auto}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
-      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}
+      body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+      .rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
+      table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
       @page{size:${size === 'a4' ? 'A4' : sz.w + ' auto'};margin:${size === 'a4' ? '14mm' : '3mm'}}</style></head><body>${this.body(o, S)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
   },
   log(o, method) { rpc('log_receipt_print', { p_order: o.id, p_method: method }).catch(() => {}); },
@@ -1247,6 +1308,95 @@ const Receipt = {
     setTimeout(() => URL.revokeObjectURL(a.href), 2000); this.log(o, 'digital');
   }
 };
+
+/* ---------- KITCHEN TICKET — simple, big-print, no prices, no payment info ---------- */
+const KitchenTicket = {
+  body(o, batchOnly) {
+    const src = batchOnly ? (o.order_items || []).filter(i => i.batch === batchOnly) : (o.order_items || []);
+    const items = src.map(i => `<div class="ki"><b>${i.qty} × ${esc(i.name)}</b>${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<div class="add">+ ${i.addons.map(a => esc(a.name)).join(', ')}</div>` : ''}${i.note ? `<div class="note">“${esc(i.note)}”</div>` : ''}</div>`).join('');
+    return `<div class="kt-box"><h4>${batchOnly ? 'KITCHEN TICKET — ADDED ITEMS' : 'KITCHEN TICKET'}</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${SRC[o.source] || o.source}</span></div>
+      <div class="row2"><span>${FUL[o.fulfillment] || o.fulfillment}${o.tbl ? ' · Table ' + esc(o.tbl.code) : ''}</span><span>${fmtTime(o.created_at)}</span></div>
+      <hr>${items}<hr>
+      ${o.notes ? `<div class="note big">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, autoPrint, size = '58', batchOnly) {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Kitchen — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+      .add{font-size:12px;font-weight:600;color:#000}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+      .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, batchOnly)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, size = '58', batchOnly) {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, true, size, batchOnly)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'kitchen-ticket' }).catch(() => {});
+  }
+};
+
+/* ---------- RIDER SLIP — what the rider physically carries ---------- */
+const RiderSlip = {
+  body(o, rider) {
+    const items = (o.order_items || []).map(i => `<div class="ki">${i.qty} × ${esc(i.name)}${i.variant ? ` (${esc(i.variant)})` : ''}</div>`).join('');
+    const due = Math.max(0, num(o.total) - num(o.paid_amount));
+    return `<div class="kt-box"><h4>DELIVERY — RIDER COPY</h4>
+      <div class="row2"><b>#${esc(o.order_no)}</b><span>${fmtTime(o.created_at)}</span></div>
+      ${rider ? `<div class="c sm">Rider: ${esc(rider.name)} (${esc(rider.rider_code)})</div>` : ''}<hr>
+      <div class="ki big">👤 ${esc(o.customer_name || '')}</div>
+      <div class="ki">📞 ${esc(o.phone || '')}</div>
+      <div class="ki addr">📍 ${esc(o.address || '')}</div><hr>
+      ${items}<hr>
+      <div class="row2 total"><span>${o.payment_status === 'paid' ? 'PAID — nothing to collect' : 'COLLECT (COD)'}</span><span>${o.payment_status === 'paid' ? '' : money(due)}</span></div>
+      ${o.notes ? `<div class="note">NOTE: ${esc(o.notes)}</div>` : ''}</div>`;
+  },
+  doc(o, rider, autoPrint, size = '58') {
+    const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Rider — ${esc(o.order_no)}</title><style>
+      body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};color:#000;background:#fff}
+      .kt-box{max-width:${sz.max};margin:0 auto}h4{margin:0 0 6px;text-align:center;font-size:15px;letter-spacing:1px}
+      .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:13px;padding:2px 0}.ki.big{font-size:16px;font-weight:800}
+      .addr{font-weight:700}.c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+      .total{font-size:16px;font-weight:900;border:2px solid #000;padding:5px}.note{font-weight:700;margin-top:4px}
+      @page{size:${sz.w} auto;margin:3mm}</style></head><body>${this.body(o, rider)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+  },
+  print(o, rider, size = '58') {
+    const w = window.open('', '_blank', 'width=380,height=560'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
+    w.document.write(this.doc(o, rider, true, size)); w.document.close();
+    rpc('log_receipt_print', { p_order: o.id, p_method: 'rider-slip' }).catch(() => {});
+  }
+};
+
+/* ---------- combined auto-print at checkout: kitchen ticket + counter receipt ----------
+   Same printer -> one print job, two pages (page-break), one confirm.
+   Different printers -> caller can still print each separately from its own screen. */
+function autoPrintOrderTickets(o, S, batchOnly) {
+  const prefs = (S.kitchen || {});
+  if (prefs.auto_print === false) return; // staff can turn this off in Settings
+  const w = window.open('', '_blank', 'width=420,height=640');
+  if (!w) { toast(t('Allow pop-ups to auto-print tickets'), 'err'); return; }
+  const sz = Receipt.SIZES['58'];
+  const pages = batchOnly
+    ? `<div class="page">${KitchenTicket.body(o, batchOnly)}</div>`   // add-items: kitchen only, no need to reprint the counter receipt
+    : `<div class="page">${KitchenTicket.body(o)}</div><div class="page">${Receipt.body(o, S)}</div>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
+    body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};font-weight:700;color:#000;background:#fff}
+    .kt-box,.rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+    .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
+    .add{font-size:12px;font-weight:600}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
+    .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
+    .rcpt-box img{height:56px;display:block;margin:0 auto 4px}table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}
+    td.r{text-align:right}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
+    .page{page-break-after:always;padding-bottom:10px}.page:last-child{page-break-after:auto}
+    @page{size:${sz.w} auto;margin:3mm}</style></head><body>
+    ${pages}
+    <script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>
+    </body></html>`;
+  w.document.write(html); w.document.close();
+  rpc('log_receipt_print', { p_order: o.id, p_method: batchOnly ? 'auto-kitchen-added' : 'auto-kitchen+counter' }).catch(() => {});
+}
 
 /* ---------- CSV / print helpers ---------- */
 function downloadCSV(name, cols, rows) {
@@ -1289,6 +1439,7 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-rate', 'Default rider rate per delivery (Rs.)', rd.default_rate ?? 100, 'number')}</div></div>` : ''}
     <div class="card"><h3>${t('Kitchen & Online')}</h3><div class="form-grid">
       <label class="f">${t('Kitchen alert sound')}<select id="s-ksnd"><option value="1" ${k.sound !== false ? 'selected' : ''}>${t('On')}</option><option value="0" ${k.sound === false ? 'selected' : ''}>${t('Off')}</option></select></label>
+      <label class="f">${t('Auto-print kitchen + counter tickets')}<select id="s-kauto"><option value="1" ${k.auto_print !== false ? 'selected' : ''}>${t('On — print automatically on every new order')}</option><option value="0" ${k.auto_print === false ? 'selected' : ''}>${t('Off — staff prints manually')}</option></select></label>
       <label class="f">${t('Website / QR ordering')}<select id="s-acc"><option value="1" ${o.accepting_orders !== false ? 'selected' : ''}>${t('Accepting orders')}</option><option value="0" ${o.accepting_orders === false ? 'selected' : ''}>${t('Paused')}</option></select></label></div></div>
     <button class="btn primary lg" id="s-save">${t('Save settings')}</button></div>`;
 }
@@ -1301,7 +1452,7 @@ async function saveSettingsForm(S, canPerm) {
     await saveSetting('permissions', { cashier_max_discount_pct: num(v('#s-disc')), cashier_can_cancel: v('#s-canc') === '1' });
     await saveSetting('rider', { default_rate: num(v('#s-rate')) });
   }
-  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1' });
+  await saveSetting('kitchen', { sound: v('#s-ksnd') === '1', auto_print: v('#s-kauto') === '1' });
   await saveSetting('online', { accepting_orders: v('#s-acc') === '1' });
 }
 
@@ -1466,6 +1617,7 @@ function deliveryActs(o) {
   if (d.status === 'on_the_way') a.push(b('delivered', 'DELIVERED', 'ok'));
   if (d.status !== 'assigned' || true) a.push(b('failed', 'Failed', 'danger'));
   if (isMgr()) a.push(`<button class="btn sm" data-act="reassign" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>`);
+  a.push(`<button class="btn sm ghost" data-act="printrider" data-id="${o.id}">🖨 ${t('Rider Slip')}</button>`);
   return a.join('');
 }
 function orderCard(o, { delivery = false } = {}) {
@@ -1480,7 +1632,7 @@ function orderCard(o, { delivery = false } = {}) {
     ${o.notes ? `<div class="sm">📝 ${esc(o.notes)}</div>` : ''}
     ${d ? `<div class="sm">🏍️ ${esc(d.riders?.name || '')} — ${esc(d.riders?.rider_code || '')} · ${t(DSTATUS[d.status])}</div>` : (o.fulfillment === 'delivery' && open ? `<div class="sm muted">🏍️ ${t('Rider not assigned')}</div>` : '')}
     <div class="om"><span>${t('Total')}</span><span class="display">${money(o.total)}</span></div>
-    <div class="acts">${orderActs(o)}${delivery ? deliveryActs(o) : ''}<button class="btn sm ghost" data-act="view" data-id="${o.id}">${t('View')}</button></div></div>`;
+    <div class="acts">${orderActs(o)}${delivery ? deliveryActs(o) : ''}${isStaff() && open && o.payment_status !== 'paid' ? `<button class="btn sm ghost" data-act="edit" data-id="${o.id}">✏️ ${t('Edit')}</button>` : ''}<button class="btn sm ghost" data-act="view" data-id="${o.id}">${t('View')}</button></div></div>`;
 }
 
 /* ---------- global click actions ---------- */
@@ -1495,7 +1647,13 @@ const ACT = {
   assign: id => assignModal(id),
   async pay(id) { payModal(await getOrder(id)); },
   view: id => orderModal(id),
+  edit: id => orderModal(id),
   async print(id) { Receipt.print(await getOrder(id), S.settings); },
+  async printkot(id) { KitchenTicket.print(await getOrder(id)); },
+  async printrider(id, el) {
+    const o = await getOrder(id); const d = activeDelivery(o);
+    RiderSlip.print(o, d && d.riders ? { name: d.riders.name, rider_code: d.riders.rider_code } : null);
+  },
   async cancel(id) {
     const r = await askText(t('Cancel order'), t('Reason'), { ok: 'Cancel order' }); if (r === null) return;
     await rpc('cancel_order', { p_order: +id, p_reason: r || '—' }); toast(t('Order cancelled')); refreshView();
@@ -1504,6 +1662,12 @@ const ACT = {
     const o = await getOrder(id); S.cart = newCart();
     S.cart.addTo = { id: o.id, order_no: o.order_no, table: o.tbl ? o.tbl.code : null }; location.hash = '#/pos';
     if (S.view === 'pos') VIEWS.pos.render();
+  },
+  async removeitem(id, el) {
+    const itemId = el.dataset.item;
+    if (!await confirmBox(t('Remove this item from the order?'))) return;
+    await rpc('remove_order_item', { p_order: +id, p_item: +itemId });
+    toast(t('Item removed')); Modal.closeAll(); refreshView(); orderModal(+id);
   },
   async closetable(id) {
     if (!await confirmBox(t('Close this table? All its orders will be completed.'), { ok: 'Close Table' })) return;
@@ -1517,7 +1681,13 @@ const ACT = {
     }
     await rpc('update_delivery_status', { p_delivery: +id, p_status: s, p_cash: cash }); toast(t('Delivery updated')); refreshView();
   },
-  async reassign(id, el) { assignModal(el.dataset.oid, { reassign: +id }); }
+  async reassign(id, el) { assignModal(el.dataset.oid, { reassign: +id }); },
+  async deleteorder(id) {
+    if (!await confirmBox(t('Permanently delete this cancelled/rejected order? This cannot be undone and is meant only for fake/test entries.'), { danger: true, ok: 'Delete Permanently' })) return;
+    await q(sb.from('order_items').delete().eq('order_id', id));
+    await q(sb.from('orders').delete().eq('id', id));
+    toast(t('Order deleted')); refreshView(); updateBadge();
+  }
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
@@ -1538,7 +1708,8 @@ async function orderModal(id) {
   const d = activeDelivery(o); const open = OPEN_ST.includes(o.status);
   const canCancel = open && (isMgr() || ((S.settings.permissions || {}).cashier_can_cancel && ['pending', 'accepted'].includes(o.status)));
   const cb = (act, label, cls = '') => `<button class="btn sm ${cls}" data-act="${act}" data-id="${o.id}" data-closes="1">${t(label)}</button>`;
-  const rows = (o.order_items || []).sort((a, b) => a.id - b.id).map(i => `<tr><td>${i.qty} × <b>${esc(i.name)}</b>${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<div class="sm muted">+ ${i.addons.map(a => esc(a.name)).join(', ')}</div>` : ''}${i.note ? `<div class="sm muted">“${esc(i.note)}”</div>` : ''}</td><td class="num">${money(i.line_total)}</td></tr>`).join('');
+  const draft = open && o.payment_status !== 'paid'; // editable (items add/removable) until the order is paid
+  const rows = (o.order_items || []).sort((a, b) => a.id - b.id).map(i => `<tr><td>${i.qty} × <b>${esc(i.name)}</b>${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<div class="sm muted">+ ${i.addons.map(a => esc(a.name)).join(', ')}</div>` : ''}${i.note ? `<div class="sm muted">“${esc(i.note)}”</div>` : ''}</td><td class="num">${money(i.line_total)}</td>${draft && isStaff() ? `<td><button class="icon-btn" data-act="removeitem" data-id="${o.id}" data-item="${i.id}" title="${t('Remove item')}">🗑</button></td>` : ''}</tr>`).join('');
   const tr = (l, v, cls = '') => `<div class="tot-row ${cls}"><span>${t(l)}</span><span>${v}</span></div>`;
   Modal.open({
     title: `#${o.order_no}`, wide: true, html: `
@@ -1549,7 +1720,7 @@ async function orderModal(id) {
     ${pays.length ? `<div class="card"><b>${t('Payments')}</b>${pays.map(p => `<div class="tot-row sm"><span>${fmtDT(p.created_at)} · ${esc(p.method)}${p.reference ? ' · ' + esc(p.reference) : ''}</span><span>${money(p.amount)}</span></div>`).join('')}</div>` : ''}
     ${d ? `<div class="card">🏍️ <b>${esc(d.riders?.name || '')}</b> — ${esc(d.riders?.rider_code || '')} · ${t(DSTATUS[d.status])}</div>` : ''}
     ${o.cancel_reason ? `<div class="banner">${t('Reason')}: ${esc(o.cancel_reason)}</div>` : ''}
-    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) && o.status !== 'pending' ? cb('additems', 'Add Items') : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}</div>`
+    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) ? cb('additems', 'Add Items') : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}${S.role === 'super_admin' && ['cancelled', 'rejected'].includes(o.status) ? cb('deleteorder', 'Delete permanently (fake entry)', 'danger') : ''}</div>`
   });
 }
 
@@ -1572,6 +1743,8 @@ async function assignModal(orderId, { reassign } = {}) {
     if (reassign) await rpc('reassign_rider', { p_delivery: reassign, p_rider: sel });
     else await rpc('assign_rider', { p_order: +orderId, p_rider: sel });
     Modal.close(w); toast(t('Rider assigned')); refreshView();
+    const riderObj = riders.find(r => r.id === sel);
+    if ((S.settings.kitchen || {}).auto_print !== false) RiderSlip.print(o, riderObj);
   }, { busy: ev.currentTarget });
 }
 
@@ -1628,14 +1801,14 @@ function showReceipt(o, { newOrderBtn = false } = {}) {
 /* =====================================================================
    THE YOUNG MALANG — POS screen (New Order) + cart engine
    ===================================================================== */
-function newCart() { return { source: S.role === 'waiter' ? 'dinein' : 'walkin', fulfillment: S.role === 'waiter' ? 'dinein' : 'pickup', table_id: null, waiter_id: S.role === 'waiter' ? S.user.id : null, items: [], customer: {}, discount: { type: 'amount', value: 0 }, payNow: false, payAmt: 0, payMethod: null, addTo: null, ref: uuid() }; }
+function newCart() { return { source: S.role === 'waiter' ? 'dinein' : 'walkin', fulfillment: S.role === 'waiter' ? 'dinein' : 'pickup', table_id: null, waiter_id: S.role === 'waiter' ? S.user.id : null, items: [], customer: {}, discount: { type: 'amount', value: 0 }, deliveryFee: null, payNow: false, payAmt: 0, payMethod: null, addTo: null, ref: uuid() }; }
 
 const SRC_FUL = { walkin: 'pickup', dinein: 'dinein', takeaway: 'pickup', phone: 'pickup', online: 'delivery', qr: 'dinein' };
 function cartCalc(c) {
   const sub = c.items.reduce((s, i) => s + (i.base + i.addons.reduce((a, x) => a + x.price, 0)) * i.qty, 0);
   const disc = Math.min(sub, c.discount.type === 'percent' ? Math.round(sub * num(c.discount.value) / 100) : num(c.discount.value));
   const chg = S.settings.charges || {};
-  let delivery = 0; if (c.fulfillment === 'delivery') { delivery = num(chg.delivery_fee); if (num(chg.free_delivery_above) > 0 && sub >= num(chg.free_delivery_above)) delivery = 0; }
+  let delivery = 0; if (c.fulfillment === 'delivery') { delivery = num(chg.delivery_fee); if (num(chg.free_delivery_above) > 0 && sub >= num(chg.free_delivery_above)) delivery = 0; if (c.deliveryFee !== null && c.deliveryFee !== undefined) delivery = num(c.deliveryFee); }
   const net = sub - disc;
   const tax = Math.round(net * num(chg.tax_pct) / 100);
   const svc = c.fulfillment === 'dinein' ? Math.round(net * num(chg.service_charge_pct) / 100) : 0;
@@ -1726,6 +1899,7 @@ VIEWS.pos = {
       <div class="tot-row grand"><span>${t('TOTAL')}</span><span>${money(calc.total)}</span></div>
       <div class="cart-btns">
         <button class="btn sm ghost" id="cb-disc">% ${t('Discount')}</button>
+        ${c.fulfillment === 'delivery' ? `<button class="btn sm ghost" id="cb-delivery">🚚 ${t('Delivery Charges')}</button>` : ''}
         <button class="btn sm ghost" id="cb-note">📝 ${t('Note')}</button>
         <button class="btn sm ghost" id="cb-clear">${t('Clear')}</button>
         <button class="btn sm ghost only-mobile" data-close-cart>${t('Close')}</button>
@@ -1734,7 +1908,19 @@ VIEWS.pos = {
     $('#cb-clear').onclick = async () => { if (!c.items.length || await confirmBox(t('Clear the current order?'))) { S.cart = c.addTo ? Object.assign(newCart(), { addTo: c.addTo }) : newCart(); this.paintCart(); } };
     $('#cb-note').onclick = async () => { const v = await askText(t('Order note'), t('Note'), { value: c.notes || '', textarea: true }); if (v !== null) c.notes = v; };
     $('#cb-disc').onclick = () => this.discountModal(calc);
+    const cbDel = $('#cb-delivery'); if (cbDel) cbDel.onclick = () => this.deliveryModal(calc);
     $('#cb-checkout').onclick = () => c.addTo ? this.submitAddItems() : this.openCheckout(calc);
+  },
+  deliveryModal(calc) {
+    const c = S.cart;
+    const w = Modal.open({
+      title: t('Delivery Charges'), html: `
+      <label class="f">${t('Delivery amount (Rs.)')}<input id="del-v" type="number" min="0" value="${c.deliveryFee ?? calc.delivery}"></label>
+      <p class="sm muted">${t('Delivery charges vary by area/distance — enter the correct amount for this order.')}</p>
+      <div class="row"><button class="btn sm ghost" id="del-reset" type="button">${t('Use default')}</button><button class="btn primary lg" id="del-go">${t('Apply')}</button></div>`
+    });
+    $('#del-reset', w).onclick = () => { c.deliveryFee = null; Modal.close(w); this.paintCart(); };
+    $('#del-go', w).onclick = () => { c.deliveryFee = num($('#del-v', w).value); Modal.close(w); this.paintCart(); };
   },
   discountModal(calc) {
     const c = S.cart; const max = cashierDiscMax();
@@ -1758,6 +1944,8 @@ VIEWS.pos = {
     const items = c.items.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, qty: i.qty, addon_ids: i.addons.map(a => a.id), note: i.note }));
     await safe(async () => {
       await rpc('add_items', { p_order: c.addTo.id, p_items: items });
+      const o = await getOrder(c.addTo.id);
+      autoPrintOrderTickets(o, S.settings, o.kitchen_batch);
       toast(t('Items added to kitchen')); S.cart = newCart(); this.render(); refreshView();
     });
   },
@@ -1806,11 +1994,13 @@ VIEWS.pos = {
         client_ref: c.ref, source: c.source, fulfillment: c.fulfillment, table_id: c.table_id, waiter_id: c.waiter_id || null,
         customer: { name, phone, address: addr, notes: c.customer.notes }, notes: c.notes || null,
         items: c.items.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, qty: i.qty, addon_ids: i.addons.map(a => a.id), note: i.note })),
-        discount: c.discount, payment: payAmt > 0 ? { amount: payAmt, method } : null
+        discount: c.discount, delivery_fee_override: (c.fulfillment === 'delivery' && c.deliveryFee !== null && c.deliveryFee !== undefined) ? num(c.deliveryFee) : null,
+        payment: payAmt > 0 ? { amount: payAmt, method } : null
       };
       const res = await rpc('create_order', { p: payload });
       Modal.close(w); toast(`${t('Order created')}: #${res.order_no}`);
       const o = await getOrder(res.id); S.cart = newCart(); this.render(); refreshView(); updateBadge();
+      autoPrintOrderTickets(o, S.settings);
       showReceipt(o, { newOrderBtn: true });
     }, { busy: ev.currentTarget });
   }
@@ -1867,7 +2057,7 @@ function orderListView(id, title, filterFn) {
       $('#view').innerHTML = `<div class="view-head"><h2>${t(title)}</h2></div>
         <div class="olist-tools">
           <input id="ol-q" placeholder="${t('Order #, name, phone…')}" value="${esc(this.f.q)}">
-          <select id="ol-range"><option value="today">${t('Today')}</option><option value="yesterday">${t('Yesterday')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="all">${t('All')}</option></select>
+          <select id="ol-range"><option value="today">${t('Today')}</option><option value="yesterday">${t('Yesterday')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="90">${t('Last 90 days')}</option><option value="365">${t('Last 1 year')}</option><option value="1095">${t('Last 3 years')}</option><option value="all">${t('All')}</option></select>
           <select id="ol-status"><option value="">${t('All statuses')}</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>
           ${id === 'orders' ? `<select id="ol-src"><option value="">${t('All sources')}</option>${Object.entries(SRC).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>` : ''}
         </div>
@@ -1884,8 +2074,7 @@ function orderListView(id, title, filterFn) {
       let qry = sb.from('orders').select(OSEL).order('created_at', { ascending: false }).limit(200);
       if (this.f.range === 'today') qry = qry.gte('created_at', startOfDay().toISOString());
       else if (this.f.range === 'yesterday') qry = qry.gte('created_at', addDays(startOfDay(), -1).toISOString()).lt('created_at', startOfDay().toISOString());
-      else if (this.f.range === '7') qry = qry.gte('created_at', addDays(startOfDay(), -7).toISOString());
-      else if (this.f.range === '30') qry = qry.gte('created_at', addDays(startOfDay(), -30).toISOString());
+      else if (['7', '30', '90', '365', '1095'].includes(this.f.range)) qry = qry.gte('created_at', addDays(startOfDay(), -Number(this.f.range)).toISOString());
       if (this.f.status) qry = qry.eq('status', this.f.status);
       if (this.f.src) qry = qry.eq('source', this.f.src);
       if (this.f.q) qry = qry.or(`order_no.ilike.%${this.f.q}%,customer_name.ilike.%${this.f.q}%,phone.ilike.%${this.f.q}%`);
@@ -1954,7 +2143,7 @@ VIEWS.kitchen = {
     const next = { accepted: ['preparing', 'PREPARING'], preparing: ['ready', 'READY'] }[o.status];
     const done = ['served', 'completed', 'delivered'].includes(o.status);
     return `<div class="kcard ${late ? 'late' : ''} ${done ? 'done' : ''}">
-      <div class="row"><span class="kn">#${esc(o.order_no)}</span>${srcTag(o.source)}${o.tbl ? `<span class="pill">${esc(o.tbl.code)}</span>` : ''}<span class="sm muted nowrap">${ago(o.confirmed_at || o.created_at)}</span></div>
+      <div class="row"><span class="kn">#${esc(o.order_no)}</span>${srcTag(o.source)}${o.tbl ? `<span class="pill">${esc(o.tbl.code)}</span>` : ''}<span class="sm muted nowrap">${ago(o.confirmed_at || o.created_at)}</span><button class="icon-btn" data-act="printkot" data-id="${o.id}" title="${t('Print ticket')}">🖨</button></div>
       ${items}${o.notes ? `<div class="note">${esc(o.notes)}</div>` : ''}
       ${next && isStaff() || (next && S.role === 'kitchen') ? `<button class="btn ${o.status === 'accepted' ? '' : 'primary'} block" data-act="${o.status === 'accepted' ? 'st_preparing' : 'st_ready'}" data-id="${o.id}">${t(next[1])}</button>` : ''}</div>`;
   }
@@ -2145,7 +2334,7 @@ VIEWS.payments = {
   range: 'today',
   async render() {
     $('#view').innerHTML = `<div class="view-head"><h2>${t('Payments')}</h2>
-      <select id="pv-range"><option value="today">${t('Today')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option></select>
+      <select id="pv-range"><option value="today">${t('Today')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="90">${t('Last 90 days')}</option><option value="365">${t('Last 1 year')}</option><option value="1095">${t('Last 3 years')}</option><option value="all">${t('All time')}</option></select>
       <button class="btn sm ghost" id="pv-export">⬇ ${t('Export')}</button></div>
       <div class="stats mb" id="pv-stats"></div><div class="tbl-wrap"><table class="tbl" id="pv-tbl"></table></div>`;
     $('#pv-range').value = this.range;
@@ -2154,7 +2343,7 @@ VIEWS.payments = {
     this.load();
   },
   refresh() { this.load(); },
-  since() { return this.range === 'today' ? startOfDay() : addDays(startOfDay(), -Number(this.range)); },
+  since() { return this.range === 'today' ? startOfDay() : this.range === 'all' ? new Date(2000, 0, 1) : addDays(startOfDay(), -Number(this.range)); },
   async load() {
     this.rows = await q(sb.from('payments').select('*, orders(order_no, source, fulfillment)').gte('created_at', this.since().toISOString()).order('created_at', { ascending: false }));
     const total = this.rows.reduce((s, p) => s + num(p.amount), 0);
@@ -2170,13 +2359,47 @@ VIEWS.payments = {
 VIEWS.customers = {
   q: '',
   async render() {
-    $('#view').innerHTML = `<div class="view-head"><h2>${t('Customers')}</h2></div>
+    $('#view').innerHTML = `<div class="view-head"><h2>${t('Customers')}</h2>${isMgr() ? `<button class="btn sm ghost" id="cu-import">⬆ ${t('Import Customers (Excel)')}</button><input type="file" id="cu-import-file" accept=".xlsx,.xls,.csv" class="hidden">` : ''}</div>
       <input id="cu-q" placeholder="${t('Search name, phone or order number')}" class="mb" style="max-width:340px">
       <div class="tbl-wrap"><table class="tbl" id="cu-tbl"></table></div>`;
     $('#cu-q').oninput = debounce(e => { this.q = e.target.value; this.load(); }, 300);
+    const imp = $('#cu-import'); if (imp) { imp.onclick = () => $('#cu-import-file').click(); $('#cu-import-file').onchange = e => { const f = e.target.files[0]; if (f) this.importFile(f); e.target.value = ''; }; }
     this.load();
   },
   refresh() { this.load(); },
+  async importFile(file) {
+    let sheetRows; try { sheetRows = await readSpreadsheet(file); } catch (err) { return toast(t('Could not read that file'), 'err'); }
+    if (!sheetRows.length) return toast(t('No rows found in that file'), 'err');
+    const header = sheetRows[0].map(h => String(h || '').trim().toLowerCase());
+    const findCol = aliases => header.findIndex(h => aliases.includes(h));
+    const cName = findCol(['name', 'customer', 'customer name', 'full name']);
+    const cPhone = findCol(['phone', 'phone number', 'mobile', 'contact']);
+    const cAddr = findCol(['address', 'addr']);
+    const cNotes = findCol(['notes', 'note', 'remarks']);
+    if (cPhone < 0) return toast(t('Could not find a Phone column in that file'), 'err');
+    const rows = sheetRows.slice(1).filter(r => r[cPhone] && String(r[cPhone]).trim()).map(r => ({
+      name: cName >= 0 ? String(r[cName] || '').trim() : '', phone: String(r[cPhone]).trim(),
+      address: cAddr >= 0 ? String(r[cAddr] || '').trim() : '', notes: cNotes >= 0 ? String(r[cNotes] || '').trim() : ''
+    }));
+    Modal.open({
+      title: t('Import Customers — Preview'), wide: true, html: `
+      <p>${t('Found')} <b>${rows.length}</b> ${t('customers')}.</p>
+      <div class="tbl-wrap" style="max-height:300px;overflow:auto"><table class="tbl"><thead><tr><th>${t('Name')}</th><th>${t('Phone')}</th><th>${t('Address')}</th></tr></thead>
+      <tbody>${rows.slice(0, 50).map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.phone)}</td><td>${esc(r.address)}</td></tr>`).join('')}</tbody></table></div>
+      ${rows.length > 50 ? `<p class="sm muted">${t('...and')} ${rows.length - 50} ${t('more')}</p>` : ''}
+      <p class="sm muted">${t('An existing customer with the same phone number will be updated, not duplicated.')}</p>
+      <button class="btn primary lg" id="ci-go">${t('Import')} ${rows.length} ${t('customers')}</button>`
+    });
+    $('#ci-go').onclick = ev => safe(async () => {
+      let created = 0, updated = 0;
+      for (const r of rows) {
+        const existing = await q(sb.from('customers').select('id').eq('phone', r.phone).limit(1));
+        if (existing.length) { await q(sb.from('customers').update({ name: r.name || undefined, address: r.address || undefined, notes: r.notes || undefined }).eq('id', existing[0].id)); updated++; }
+        else { await q(sb.from('customers').insert({ name: r.name || null, phone: r.phone, address: r.address || null, notes: r.notes || null })); created++; }
+      }
+      Modal.closeAll(); toast(`${t('Imported')}: ${created} ${t('new')}, ${updated} ${t('updated')}`); this.load();
+    }, { busy: ev.currentTarget });
+  },
   async load() {
     let rows;
     if (this.q && /^YM-/i.test(this.q.trim())) {
@@ -2208,7 +2431,7 @@ VIEWS.reports = {
   tab: 'sales', range: 'today',
   async render() {
     $('#view').innerHTML = `<div class="view-head"><h2>${t('Reports')}</h2>
-      <select id="rp-range"><option value="today">${t('Today')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option></select></div>
+      <select id="rp-range"><option value="today">${t('Today')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="90">${t('Last 90 days')}</option><option value="365">${t('Last 1 year')}</option><option value="1095">${t('Last 3 years')}</option><option value="all">${t('All time')}</option></select></div>
       <div class="tabs" id="rp-tabs">${[['sales', 'Daily Sales'], ['orders', 'Daily Orders'], ['payment', 'Payment'], ['online', 'Online Orders'], ['manual', 'Manual Orders'], ['delivery', 'Delivery'], ['rider', 'Rider Delivery'], ['waiter', 'Waiter'], ['cancelled', 'Cancelled']].map(([k, l]) => `<button class="tab ${this.tab === k ? 'on' : ''}" data-t="${k}">${t(l)}</button>`).join('')}</div>
       <div id="rp-body"></div>`;
     $('#rp-range').value = this.range; $('#rp-range').onchange = e => { this.range = e.target.value; this.load(); };
@@ -2216,20 +2439,25 @@ VIEWS.reports = {
     this.load();
   },
   refresh() { this.load(); },
-  since() { return this.range === 'today' ? startOfDay() : addDays(startOfDay(), -Number(this.range)); },
+  since() { return this.range === 'today' ? startOfDay() : this.range === 'all' ? new Date(2000, 0, 1) : addDays(startOfDay(), -Number(this.range)); },
   async load() {
     const body = $('#rp-body'); body.innerHTML = `<div class="empty">${t('Loading')}…</div>`;
     const since = this.since().toISOString();
     const orders = await q(sb.from('orders').select('*').gte('created_at', since));
     const done = orders.filter(o => ['completed', 'delivered'].includes(o.status));
     const cancelled = orders.filter(o => ['cancelled', 'rejected'].includes(o.status));
-    const head = `<div class="row end mb"><button class="btn sm ghost" id="rp-print">🖨 ${t('Print')}</button><button class="btn sm ghost" id="rp-csv">⬇ ${t('Export')}</button></div>`;
+    const head = `<div class="row end mb"><button class="btn sm ghost" id="rp-import-sales">📥 ${t('Import Old Sales Totals')}</button><input type="file" id="rp-import-sales-file" accept=".csv,.xlsx,.xls" class="hidden"><button class="btn sm ghost" id="rp-import">⬆ ${t('View old backup file')}</button><input type="file" id="rp-import-file" accept=".csv,.xlsx,.xls" class="hidden"><button class="btn sm ghost" id="rp-print">🖨 ${t('Print')}</button><button class="btn sm ghost" id="rp-csv">⬇ ${t('Export')}</button></div>`;
+    let historical = [];
+    if (this.tab === 'sales') { try { historical = await q(sb.from('historical_sales').select('*').gte('sale_date', isoDate(this.since())).lte('sale_date', isoDate(new Date()))); } catch (e) { historical = []; } }
     let rows, cols, tableHTML, title = this.tab;
     if (this.tab === 'sales') {
-      const days = {}; done.forEach(o => { const k = isoDate(o.created_at); days[k] = (days[k] || 0) + num(o.total); });
-      rows = Object.entries(days).sort((a, b) => b[0].localeCompare(a[0])).map(([d, v]) => ({ date: d, total: v }));
-      cols = [{ label: 'Date', key: 'date' }, { label: 'Sales', get: r => money(r.total) }];
+      const days = {}; done.forEach(o => { const k = isoDate(o.created_at); days[k] = days[k] || { live: 0, imported: 0 }; days[k].live += num(o.total); });
+      historical.forEach(h => { const k = h.sale_date; days[k] = days[k] || { live: 0, imported: 0 }; days[k].imported += num(h.amount); });
+      rows = Object.entries(days).sort((a, b) => b[0].localeCompare(a[0])).map(([d, v]) => ({ date: d, live: v.live, imported: v.imported, total: v.live + v.imported }));
+      cols = [{ label: 'Date', key: 'date' }, { label: 'Sales', get: r => money(r.live) }, { label: 'Imported (old POS)', get: r => r.imported ? money(r.imported) : '—' }, { label: 'Total', get: r => money(r.total) }];
       title = 'Daily Sales Report';
+      const grand = rows.reduce((s, r) => s + r.total, 0);
+      var salesFooter = `<div class="card mt"><b>${t('Grand Total (period)')}: ${money(grand)}</b>${historical.length ? ` <span class="sm muted">(${t('includes imported old-POS totals — for audit')})</span>` : ''}</div>`;
     } else if (this.tab === 'orders') {
       rows = orders.map(o => ({ order_no: o.order_no, date: fmtDT(o.created_at), source: t(SRC[o.source]), status: t(STATUS[o.status]), total: money(o.total) }));
       cols = [{ label: 'Order', key: 'order_no' }, { label: 'Date', key: 'date' }, { label: 'Source', key: 'source' }, { label: 'Status', key: 'status' }, { label: 'Total', key: 'total' }];
@@ -2268,11 +2496,94 @@ VIEWS.reports = {
     }
     this._rows = rows; this._cols = cols; this._title = title;
     tableHTML = `<table class="tbl"><thead><tr>${cols.map(c => `<th>${t(c.label)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${esc(c.get ? c.get(r) : r[c.key])}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" class="center muted">${t('No data')}</td></tr>`}</tbody></table>`;
-    body.innerHTML = head + `<div class="tbl-wrap">${tableHTML}</div>`;
-    $('#rp-print').onclick = () => printHTML(t(title), tableHTML);
+    body.innerHTML = head + `<div class="tbl-wrap">${tableHTML}</div>` + (this.tab === 'sales' ? salesFooter : '');
+    $('#rp-print').onclick = () => printHTML(t(title), tableHTML + (this.tab === 'sales' ? salesFooter : ''));
     $('#rp-csv').onclick = () => downloadCSV(this.tab, cols, rows);
+    $('#rp-import').onclick = () => $('#rp-import-file').click();
+    $('#rp-import-sales').onclick = () => $('#rp-import-sales-file').click();
+    $('#rp-import-sales-file').onchange = async e => {
+      const file = e.target.files[0]; if (!file) return; e.target.value = '';
+      let sheetRows; try { sheetRows = await readSpreadsheet(file); } catch (err) { return toast(t('Could not read that file'), 'err'); }
+      if (!sheetRows.length) return toast(t('No rows found in that file'), 'err');
+      const header = sheetRows[0].map(h => String(h || '').trim().toLowerCase());
+      const findCol = aliases => header.findIndex(h => aliases.includes(h));
+      const cDate = findCol(['date', 'sale date', 'day']);
+      const cAmt = findCol(['amount', 'total', 'sales', 'sale amount']);
+      const cNote = findCol(['note', 'notes', 'remarks']);
+      if (cDate < 0 || cAmt < 0) return toast(t('Could not find Date/Amount columns in that file'), 'err');
+      const toISODate = v => {
+        if (v instanceof Date) return isoDate(v);
+        const s = String(v).trim();
+        const m1 = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m1) return s.slice(0, 10);
+        const m2 = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/); if (m2) return `${m2[3]}-${String(m2[1]).padStart(2, '0')}-${String(m2[2]).padStart(2, '0')}`;
+        return isoDate(new Date(s));
+      };
+      const importRows = sheetRows.slice(1).filter(r => r[cDate] && r[cAmt] !== '' && r[cAmt] != null).map(r => ({ sale_date: toISODate(r[cDate]), amount: num(r[cAmt]), note: cNote >= 0 ? String(r[cNote] || '').trim() : t('Imported from old POS') }));
+      if (!importRows.length) return toast(t('No valid rows to import'), 'err');
+      const totalAmt = importRows.reduce((s, r) => s + r.amount, 0);
+      Modal.open({
+        title: t('Import Old Sales Totals — Preview'), wide: true, html: `
+        <p>${t('Found')} <b>${importRows.length}</b> ${t('days')}, ${t('total')}: <b>${money(totalAmt)}</b>.</p>
+        <p class="sm muted">${t('These amounts will be added to your reports as "Imported (old POS)" so your annual/audit totals stay complete — they will not create individual orders.')}</p>
+        <div class="tbl-wrap" style="max-height:260px;overflow:auto"><table class="tbl"><thead><tr><th>${t('Date')}</th><th>${t('Amount')}</th></tr></thead>
+        <tbody>${importRows.slice(0, 60).map(r => `<tr><td>${esc(r.sale_date)}</td><td>${money(r.amount)}</td></tr>`).join('')}</tbody></table></div>
+        <button class="btn primary lg" id="isi-go">${t('Import')} ${importRows.length} ${t('days')}</button>`
+      });
+      $('#isi-go').onclick = ev => safe(async () => {
+        try { await q(sb.from('historical_sales').insert(importRows)); }
+        catch (err) { Modal.closeAll(); return toast(t('Your database is not set up for this yet — ask your developer to add the historical_sales table (see backend-changes-needed.sql)'), 'err'); }
+        Modal.closeAll(); toast(t('Old sales totals imported')); this.load();
+      }, { busy: ev.currentTarget });
+    };
+    $('#rp-import-file').onchange = async e => {
+      const file = e.target.files[0]; if (!file) return; e.target.value = '';
+      let parsed; try { parsed = await readSpreadsheet(file); } catch (err) { return toast(t('Could not read that file'), 'err'); }
+      if (!parsed.length) return toast(t('Could not read that file'), 'err');
+      const [hdr, ...body2] = parsed;
+      const html = `<div class="tbl-wrap"><table class="tbl"><thead><tr>${hdr.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${body2.map(r => `<tr>${hdr.map((_, i) => `<td>${esc(r[i] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      Modal.open({ title: `${t('Old backup')}: ${esc(file.name)}`, wide: true, html: `<p class="sm muted">${t('This is a read-only view of the file you exported earlier — it is not written back into the live system.')}</p>${html}` });
+    };
   }
 };
+function parseCSV(text) {
+  text = text.replace(/^\ufeff/, '');
+  const rows = []; let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else field += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(field); field = ''; rows.push(row); row = []; }
+    else field += c;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.length > 1 || r[0] !== '');
+}
+/* ---------- generic Excel/CSV reader — used by every "Import from Excel" button ---------- */
+function readSpreadsheet(file) {
+  return new Promise((resolve, reject) => {
+    const isCSV = /\.csv$/i.test(file.name);
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('read failed'));
+    if (isCSV) {
+      reader.onload = () => resolve(parseCSV(reader.result));
+      reader.readAsText(file);
+    } else {
+      reader.onload = () => {
+        try {
+          const wb = XLSX.read(reader.result, { type: 'array' });
+          const sheet = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+          resolve(rows);
+        } catch (e) { reject(e); }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
 
 /* ---------- SETTINGS ---------- */
 VIEWS.settings = {
@@ -2305,12 +2616,16 @@ VIEWS.settings = {
       $$('[data-avail]').forEach(cb => cb.onchange = () => safe(() => rpc('set_product_available', { p_product: +cb.dataset.avail, p_flag: cb.checked })));
     } else if (tabId === 'users') {
       const users = await q(sb.from('profiles').select('*').order('created_at'));
-      body.innerHTML = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>${t('Name')}</th><th>${t('Username')}</th><th>${t('Role')}</th><th>${t('Status')}</th><th></th></tr></thead>
+      const ucols = [{ label: 'Name', key: 'full_name' }, { label: 'Username', key: 'username' }, { label: 'Role', get: u => t(ROLE_LABEL[u.role] || u.role) }, { label: 'Status', get: u => u.is_active ? t('Active') : t('Inactive') }];
+      body.innerHTML = `<div class="row end mb"><button class="btn sm ghost" id="us-print">🖨 ${t('Print')}</button><button class="btn sm ghost" id="us-csv">⬇ ${t('Export')}</button></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>${t('Name')}</th><th>${t('Username')}</th><th>${t('Role')}</th><th>${t('Status')}</th><th></th></tr></thead>
         <tbody>${users.map(u => `<tr><td>${esc(u.full_name)}</td><td>${esc(u.username)}</td>
         <td><select data-urole="${u.id}" ${u.id === S.user.id ? 'disabled' : ''}>${Object.keys(ROLE_LABEL).map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${t(ROLE_LABEL[r])}</option>`).join('')}</select></td>
         <td><label class="row sm"><input type="checkbox" data-uactive="${u.id}" ${u.is_active ? 'checked' : ''} ${u.id === S.user.id ? 'disabled' : ''}> ${t('Active')}</label></td>
         <td><button class="btn sm ghost" data-upass="${u.id}">${t('Set Password')}</button></td></tr>`).join('')}</tbody></table></div>
         <p class="sm muted mt">${t('New staff sign up on the login screen with a username and password, then appear here to be activated.')}</p>`;
+      $('#us-csv').onclick = () => downloadCSV('staff', ucols, users);
+      $('#us-print').onclick = () => printHTML(t('Staff List'), `<table><thead><tr>${ucols.map(c => `<th>${t(c.label)}</th>`).join('')}</tr></thead><tbody>${users.map(u => `<tr>${ucols.map(c => `<td>${esc(c.get ? c.get(u) : u[c.key])}</td>`).join('')}</tr>`).join('')}</tbody></table>`);
       $$('[data-urole]').forEach(s => s.onchange = () => safe(() => q(sb.from('profiles').update({ role: s.value }).eq('id', s.dataset.urole))));
       $$('[data-uactive]').forEach(cb => cb.onchange = () => safe(() => q(sb.from('profiles').update({ is_active: cb.checked }).eq('id', cb.dataset.uactive))));
       $$('[data-upass]').forEach(b => b.onclick = () => safe(async () => { const p = await askText(t('Set Password'), t('New password / PIN (min 6 chars)'), { type: 'password' }); if (!p) return; await rpc('admin_set_password', { p_user: b.dataset.upass, p_password: p }); toast(t('Password updated')); }));
