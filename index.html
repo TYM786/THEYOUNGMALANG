@@ -651,6 +651,23 @@ window.UR = {
  "Confirm: refund": "تصدیق: ریفنڈ",
  "Refund recorded": "ریفنڈ ریکارڈ ہو گیا",
  "Low stock": "کم اسٹاک",
+ "Attendance": "حاضری",
+ "Staff ID": "اسٹاف آئی ڈی",
+ "PIN": "پن",
+ "Check In": "چیک ان",
+ "Check Out": "چیک آؤٹ",
+ "View my record": "میرا ریکارڈ دیکھیں",
+ "Enter Staff ID and PIN": "اسٹاف آئی ڈی اور پن درج کریں",
+ "Checked in": "چیک ان ہو گیا",
+ "Checked out": "چیک آؤٹ ہو گیا",
+ "Today": "آج",
+ "Not checked in": "ابھی چیک ان نہیں کیا",
+ "checked out": "چیک آؤٹ",
+ "This month": "اس مہینے",
+ "days present": "دن حاضر",
+ "late": "لیٹ",
+ "Advance outstanding": "بقایا ایڈوانس",
+ "Last payroll": "پچھلی تنخواہ",
  "Permanently delete this order and all its data (items, payments, delivery)? This cannot be undone — use only for test/fake entries.": "کیا اس آرڈر اور اس کا تمام ڈیٹا (آئٹمز، پیمنٹس، ڈیلیوری) مستقل حذف کرنا ہے؟ یہ واپس نہیں ہو سکتا — صرف ٹیسٹ/فرضی اندراجات کے لیے استعمال کریں۔",
  "Delete Permanently": "مستقل حذف کریں",
  "Order deleted": "آرڈر حذف ہو گیا",
@@ -1019,12 +1036,6 @@ window.UR = {
  "Off — staff prints manually": "آف — اسٹاف خود پرنٹ کرے گا",
  "Allow pop-ups to auto-print tickets": "ٹکٹ خودکار پرنٹ کے لیے پاپ اپ کی اجازت دیں"
 };
-Object.assign(window.UR, {
- "Edit Charges / Details": "چارجز / تفصیلات میں ترمیم",
- "You can change these until the order is paid.": "آرڈر کی ادائیگی تک آپ یہ تبدیل کر سکتے ہیں۔",
- "Save changes": "تبدیلیاں محفوظ کریں",
- "Order updated": "آرڈر اپڈیٹ ہو گیا"
-});
 
 
 /* =====================================================================
@@ -1241,11 +1252,13 @@ const Shell = {
       <div class="tb-right">
         <span id="tb-live" class="live off">● ${t('Live')}</span>
         <div class="tb-clock" id="tb-clock"></div>
+        <button class="btn ghost sm" id="btn-kiosk">🕒 ${t('Attendance')}</button>
         <button class="btn ghost sm lang-btn" id="btn-lang"></button>
         ${themeSelect('sel-theme')}
         <div class="tb-user"><span class="avatar" id="tb-av">?</span><div><b id="tb-name"></b><small id="tb-role"></small></div></div>
       </div>`;
     $('#btn-lang').onclick = () => this.toggleLang();
+    $('#btn-kiosk').onclick = () => kioskModal();
     $('#sel-theme').onclick = () => cycleTheme();
     $('#btn-menu').onclick = () => $('#app').classList.toggle('menu-open');
     setLang(LANG); setTheme(localStorage.getItem('ym_theme') || 'classic');
@@ -1788,53 +1801,6 @@ const ACT = {
     S.cart.addTo = { id: o.id, order_no: o.order_no, table: o.tbl ? o.tbl.code : null }; location.hash = '#/pos';
     if (S.view === 'pos') VIEWS.pos.render();
   },
-  async editorder(id) {
-    const o = await getOrder(id);
-    const sub = (o.order_items || []).reduce((a, i) => a + num(i.line_total), 0);
-    const chg = S.settings.charges || {};
-    const isDel = o.fulfillment === 'delivery';
-    let dtype = 'amount';
-    const w = Modal.open({
-      title: `${t('Edit Charges / Details')} · #${o.order_no}`, html: `
-      <div class="banner">${t('You can change these until the order is paid.')}</div>
-      <div class="muted b sm">${t('Discount')}</div>
-      <div class="row"><div class="chips" id="eo-dt"><button type="button" class="chip on" data-dt="amount">Rs.</button><button type="button" class="chip" data-dt="percent">%</button></div>
-        <input id="eo-disc" type="number" min="0" value="${num(o.discount) || ''}" placeholder="0" style="max-width:150px"></div>
-      ${isDel ? `<label class="f">${t('Delivery Charges (Rs.)')}<input id="eo-dfee" type="number" min="0" value="${num(o.delivery_fee)}"></label>` : ''}
-      <div class="form-grid">
-        <label class="f">${t('Customer Name')}<input id="eo-name" value="${esc(o.customer_name || '')}"></label>
-        <label class="f">${t('Phone Number')}<input id="eo-phone" value="${esc(o.phone || '')}" inputmode="tel"></label>
-        ${isDel || o.address ? `<label class="f full">${t('Address')}<textarea id="eo-addr">${esc(o.address || '')}</textarea></label>` : ''}
-        <label class="f full">${t('Order note')}<textarea id="eo-notes">${esc(o.notes || '')}</textarea></label>
-      </div>
-      <div class="tot-row"><span>${t('Subtotal')}</span><span>${money(sub)}</span></div>
-      <div class="tot-row grand" id="eo-total"></div>
-      <button class="btn primary lg" id="eo-go">${t('Save changes')}</button>`
-    });
-    const calc = () => {
-      const v = num($('#eo-disc', w).value);
-      const disc = Math.min(sub, dtype === 'percent' ? Math.round(sub * v / 100) : v);
-      const net = sub - disc;
-      const dfee = isDel ? num($('#eo-dfee', w).value) : num(o.delivery_fee);
-      const tax = Math.round(net * num(chg.tax_pct) / 100);
-      const sc = o.fulfillment === 'dinein' ? Math.round(net * num(chg.service_charge_pct) / 100) : 0;
-      const tot = net + dfee + tax + sc;
-      $('#eo-total', w).innerHTML = `<span>${t('TOTAL')}</span><span>${money(tot)}</span>`;
-    };
-    calc();
-    w.addEventListener('input', calc);
-    w.addEventListener('click', e => { const c = e.target.closest('[data-dt]'); if (c) { dtype = c.dataset.dt; $$('[data-dt]', w).forEach(x => x.classList.toggle('on', x === c)); calc(); } });
-    $('#eo-go', w).onclick = ev => safe(async () => {
-      const name = $('#eo-name', w).value.trim(), phone = $('#eo-phone', w).value.trim(), addr = $('#eo-addr', w) ? $('#eo-addr', w).value.trim() : (o.address || '');
-      if (isDel && (!name || !phone || !addr)) throw new Error(t('Delivery needs customer name, phone and address'));
-      await rpc('update_order_details', {
-        p_order: +id, p_disc_type: dtype, p_disc_value: num($('#eo-disc', w).value),
-        p_delivery_fee: isDel ? num($('#eo-dfee', w).value) : null,
-        p_notes: $('#eo-notes', w).value.trim(), p_name: name, p_phone: phone, p_address: addr
-      });
-      Modal.closeAll(); toast(t('Order updated')); refreshView(); orderModal(+id);
-    }, { busy: ev.currentTarget });
-  },
   async removeitem(id, el) {
     const itemId = el.dataset.item;
     if (!await confirmBox(t('Remove this item from the order?'))) return;
@@ -1908,7 +1874,7 @@ async function orderModal(id) {
     ${pays.length ? `<div class="card"><b>${t('Payments')}</b>${pays.map(p => `<div class="tot-row sm"><span>${fmtDT(p.created_at)} · ${esc(p.method)}${p.reference ? ' · ' + esc(p.reference) : ''}</span><span>${money(p.amount)}</span></div>`).join('')}</div>` : ''}
     ${d ? `<div class="card">🏍️ <b>${esc(d.riders?.name || '')}</b> — ${esc(d.riders?.rider_code || '')} · ${t(DSTATUS[d.status])}</div>` : ''}
     ${o.cancel_reason ? `<div class="banner">${t('Reason')}: ${esc(o.cancel_reason)}</div>` : ''}
-    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) ? cb('additems', 'Add Items') : ''}${draft && isStaff() ? `<button class="btn sm" data-act="editorder" data-id="${o.id}">✏️ ${t('Edit Charges / Details')}</button>` : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && ['paid', 'partial'].includes(o.payment_status) ? cb('refund', 'Refund', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}${S.role === 'super_admin' ? cb('deleteorder', 'Delete permanently (testing)', 'danger') : ''}</div>`
+    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) ? cb('additems', 'Add Items') : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && ['paid', 'partial'].includes(o.payment_status) ? cb('refund', 'Refund', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}${S.role === 'super_admin' ? cb('deleteorder', 'Delete permanently (testing)', 'danger') : ''}</div>`
   });
 }
 
@@ -2873,6 +2839,37 @@ document.addEventListener('click', e => {
   if (e.target.closest('.sidebar') && !e.target.closest('[data-nav], [data-act="logout"], a.nav-item')) return;
   app.classList.remove('menu-open');
 });
+/* ---------- attendance kiosk (self check-in/out, any logged-in staff) ---------- */
+function kioskModal() {
+  const w = Modal.open({
+    title: t('Attendance'), html: `<div class="form-grid">
+    <label class="f">${t('Staff ID')}<input id="kk-code" style="text-transform:uppercase" placeholder="ST-001"></label>
+    <label class="f">${t('PIN')}<input id="kk-pin" type="password" inputmode="numeric" maxlength="8"></label></div>
+    <div class="row"><button class="btn primary lg" id="kk-in">✅ ${t('Check In')}</button><button class="btn lg" id="kk-out">🚪 ${t('Check Out')}</button></div>
+    <button class="btn sm ghost mt" id="kk-view">${t('View my record')}</button>
+    <div id="kk-result" class="mt"></div>`
+  });
+  const go = action => safe(async () => {
+    const code = $('#kk-code', w).value.trim(), pin = $('#kk-pin', w).value.trim();
+    if (!code || !pin) return toast(t('Enter Staff ID and PIN'), 'err');
+    const res = await rpc('staff_kiosk_check', { p_code: code, p_pin: pin, p_action: action });
+    $('#kk-result', w).innerHTML = `<div class="banner">✅ ${esc(res.name)} (${esc(res.staff_code)}) — ${action === 'in' ? t('Checked in') : t('Checked out')} ${fmtDT(action === 'in' ? res.check_in : res.check_out)}</div>`;
+  });
+  $('#kk-in', w).onclick = () => go('in');
+  $('#kk-out', w).onclick = () => go('out');
+  $('#kk-view', w).onclick = () => safe(async () => {
+    const code = $('#kk-code', w).value.trim(), pin = $('#kk-pin', w).value.trim();
+    if (!code || !pin) return toast(t('Enter Staff ID and PIN'), 'err');
+    const r = await rpc('staff_kiosk_lookup', { p_code: code, p_pin: pin });
+    $('#kk-result', w).innerHTML = `<div class="card">
+      <p><b>${esc(r.name)}</b> — ${esc(r.designation || '')}</p>
+      <p>${t('Today')}: ${r.today?.check_in ? t('Checked in') + ' ' + fmtDT(r.today.check_in) : t('Not checked in')}${r.today?.check_out ? ', ' + t('checked out') + ' ' + fmtDT(r.today.check_out) : ''}</p>
+      <p>${t('This month')}: ${r.month_present} ${t('days present')}, ${r.month_late} ${t('late')}</p>
+      <p>${t('Advance outstanding')}: ${money(r.advance_outstanding)}</p>
+      ${r.last_payroll ? `<p>${t('Last payroll')} (${new Date(r.last_payroll.month).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}): ${money(r.last_payroll.net)} — ${t(r.last_payroll.status)}</p>` : ''}
+      </div>`;
+  });
+}
 </script>
 </body>
 </html>
