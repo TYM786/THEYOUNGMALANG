@@ -452,6 +452,7 @@ input, select, textarea {
 .nav-group { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .65; padding: 12px 12px 2px; }
 .sidebar { overflow-y: auto; }
 tr.click { cursor: pointer; }
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}.chk{display:flex;gap:6px;align-items:center}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -488,6 +489,43 @@ window.YM_CONFIG = {
 };
 
 window.UR = {
+ "Mark Paid": "ادا شدہ کریں",
+ "Mark Unpaid": "غیر ادا شدہ کریں",
+ "Edit Payment": "ادائیگی تبدیل کریں",
+ "Payment status updated": "ادائیگی کی حالت اپڈیٹ ہو گئی",
+ "Paid Amount (Rs.)": "ادا شدہ رقم (روپے)",
+ "New Recipe": "نئی ریسیپی",
+ "Continue": "جاری رکھیں",
+ "Each size can now have its own recipe/quantities. Stock is deducted automatically when the product is sold.": "اب ہر سائز کی اپنی الگ ریسیپی/مقدار ہو سکتی ہے۔ پروڈکٹ بکتے ہی اسٹاک خودکار کم ہو جاتا ہے۔",
+ "Can Make Now (from current stock)": "ابھی کتنا بن سکتا ہے (موجودہ اسٹاک سے)",
+ "Can make now": "ابھی بن سکتے ہیں",
+ "Limited by": "کس چیز کی کمی ہے",
+ "No recipe set": "ریسیپی موجود نہیں",
+ "This item is sold as-is on the menu (e.g. cold drink, water bottle) — auto-create its recipe": "یہ چیز ویسے ہی مینو میں بکتی ہے (جیسے کولڈ ڈرنک، پانی کی بوتل) — اس کی ریسیپی خودکار بنا دیں",
+ "Menu Product": "مینیو پراڈکٹ",
+ "Create new product with this name": "اسی نام سے نئی پراڈکٹ بنائیں",
+ "Menu Category": "مینیو کیٹیگری",
+ "Selling Price (Rs.)": "فروخت قیمت (روپے)",
+ "Picture": "تصویر",
+ "Remove": "ہٹائیں",
+ "Upload a photo from your phone or computer (auto-resized).": "فون یا کمپیوٹر سے تصویر اپلوڈ کریں (خودکار سائز ہو جائے گی)۔",
+ "Website Content": "ویب سائٹ مواد",
+ "Open Website": "ویب سائٹ کھولیں",
+ "Save website": "ویب سائٹ محفوظ کریں",
+ "Home banner & offer": "ہوم بینر اور آفر",
+ "Banner title": "بینر عنوان",
+ "Banner subtitle": "بینر ذیلی عنوان",
+ "Offer strip text": "آفر کی پٹی",
+ "Open / Closed & Delivery": "اوقات اور ڈیلیوری",
+ "Opens at": "کھلنے کا وقت",
+ "Closes at": "بند ہونے کا وقت",
+ "Minimum online order": "کم از کم آن لائن آرڈر",
+ "Default delivery fee": "عام ڈیلیوری فیس",
+ "Deals page": "ڈیلز پیج",
+ "Featured items on Home": "ہوم پر نمایاں آئٹمز",
+ "About & Contact": "تعارف اور رابطہ",
+ "About us": "ہمارے بارے میں",
+ "Saved": "محفوظ ہو گیا",
  "Dashboard": "ڈیش بورڈ",
  "Orders": "آرڈرز",
  "New Order / POS": "نیا آرڈر",
@@ -858,6 +896,12 @@ window.UR = {
  "Tagline": "ٹیگ لائن",
  "Phone numbers (comma separated)": "فون نمبرز (کاما سے الگ)",
  "Receipt footer": "رسید فوٹر",
+ "Show logo on receipt": "رسید پر لوگو دکھائیں",
+ "Logo size on receipt (px, 20–160)": "رسید پر لوگو کا سائز (پکسل)",
+ "Show restaurant name on receipt": "رسید پر ریسٹورنٹ کا نام دکھائیں",
+ "Show tagline on receipt": "رسید پر ٹیگ لائن دکھائیں",
+ "Show software-provider line at the bottom of printed receipts": "پرنٹ شدہ رسید کے نیچے سافٹ ویئر فراہم کنندہ کی لائن دکھائیں",
+ "Software-provider line text": "سافٹ ویئر فراہم کنندہ کی لائن کا متن",
  "Charges": "چارجز",
  "Delivery charges (Rs.)": "ڈیلیوری چارجز (روپے)",
  "Free delivery above (Rs., 0 = never)": "مفت ڈیلیوری حد (روپے، 0 = کبھی نہیں)",
@@ -1072,6 +1116,21 @@ const num = v => Number(v) || 0;
 const money = n => `${BR.currency} ${Math.round(num(n)).toLocaleString('en-US')}`;
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
 const debounce = (fn, ms = 300) => { let h; return (...a) => { clearTimeout(h); h = setTimeout(() => fn(...a), ms); }; };
+function resizeImageFile(file, maxSide = 900, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width: w, height: h } = img;
+      if (w > maxSide || h > maxSide) { const r = Math.min(maxSide / w, maxSide / h); w = Math.round(w * r); h = Math.round(h * r); }
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+    img.src = url;
+  });
+}
 const startOfDay = (d = new Date()) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
 const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
 const isoDate = d => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
@@ -1417,8 +1476,8 @@ const Receipt = {
     const lines = (o.order_items || []).map(i => `<tr><td>${i.qty} × ${esc(i.name)}${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<br><small>+ ${i.addons.map(a => esc(a.name)).join(', ')}</small>` : ''}${i.note ? `<br><small>“${esc(i.note)}”</small>` : ''}</td><td class="r">${money(i.line_total)}</td></tr>`).join('');
     const row = (l, v) => `<tr><td>${l}</td><td class="r">${v}</td></tr>`;
     const sb = this.servedBy(o);
-    return `<div class="rcpt-box"><img src="${BR.logo}" alt=""><h4>${esc(r.name || BR.name)}</h4>
-      ${(r.tagline || BR.tagline) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
+    return `<div class="rcpt-box">${r.show_logo !== false ? `<img src="${BR.logo}" alt="" style="${r.logo_size ? `height:${num(r.logo_size)}px;` : ''}mix-blend-mode:multiply;background:#fff">` : ''}${r.show_name !== false ? `<h4>${esc(r.name || BR.name)}</h4>` : ''}
+      ${(r.show_tagline !== false && (r.tagline || BR.tagline)) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
       <div class="c">${esc(r.address || BR.address)}<br>${esc(phones)}${r.ntn ? `<br>NTN: ${esc(r.ntn)}` : ''}</div><hr>
       <table>${row('Order No', `<b>${esc(o.order_no)}</b>`)}${row('Receipt No', esc(o.receipt_no || '—'))}${row('Date', fmtDT(o.created_at))}${row('Type', `${SRC[o.source] || o.source} / ${FUL[o.fulfillment] || o.fulfillment}`)}
       ${o.tbl ? row('Table', esc(o.tbl.code)) : ''}${o.customer_name ? row('Customer', esc(o.customer_name)) : ''}${o.phone ? row('Phone', esc(o.phone)) : ''}
@@ -1690,7 +1749,13 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-name', 'Restaurant name', r.name || BR.name)}${f('s-tag', 'Tagline', r.tagline || BR.tagline)}
       ${f('s-ph', 'Phone numbers (comma separated)', (r.phones || BR.phones).join(', '))}${f('s-addr', 'Address', r.address || BR.address)}
       ${f('s-ntn', 'NTN (Tax Number)', r.ntn || '')}
-      <label class="f full">${t('Receipt footer')}<input id="s-foot" value="${esc(r.receipt_footer || '')}"></label></div></div>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showlogo" type="checkbox" ${r.show_logo !== false ? 'checked' : ''}> ${t('Show logo on receipt')}</label>
+      ${f('s-logosize', 'Logo size on receipt (px, 20–160)', r.logo_size || 64, 'number')}
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showname" type="checkbox" ${r.show_name !== false ? 'checked' : ''}> ${t('Show restaurant name on receipt')}</label>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showtag" type="checkbox" ${r.show_tagline !== false ? 'checked' : ''}> ${t('Show tagline on receipt')}</label>
+      <label class="f full">${t('Receipt footer')}<input id="s-foot" value="${esc(r.receipt_footer || '')}"></label>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-swcredit-on" type="checkbox" ${r.software_credit_enabled ? 'checked' : ''}> ${t('Show software-provider line at the bottom of printed receipts')}</label>
+      <label class="f full">${t('Software-provider line text')}<input id="s-swcredit-text" value="${esc(r.software_credit_text || 'POS Software Provided by MFJ 03469592120')}"></label></div></div>
     <div class="card"><h3>${t('Charges')}</h3><div class="form-grid">
       ${f('s-del', 'Delivery charges (Rs.)', c.delivery_fee ?? 0, 'number')}${f('s-free', 'Free delivery above (Rs., 0 = never)', c.free_delivery_above ?? 0, 'number')}
       ${f('s-tax', 'Tax %', c.tax_pct ?? 0, 'number')}${f('s-svc', 'Dine-in service charge %', c.service_charge_pct ?? 0, 'number')}
@@ -1712,7 +1777,7 @@ function settingsFormHTML(S, canPerm) {
 }
 async function saveSettingsForm(S, canPerm) {
   const v = id => $(id).value;
-  await saveSetting('restaurant', { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot') });
+  await saveSetting('restaurant', Object.assign({}, S.restaurant || {}, { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot'), show_logo: $('#s-showlogo').checked, show_name: $('#s-showname').checked, show_tagline: $('#s-showtag').checked, logo_size: Math.min(160, Math.max(20, num(v('#s-logosize')) || 64)), software_credit_enabled: $('#s-swcredit-on').checked, software_credit_text: v('#s-swcredit-text') }));
   await saveSetting('charges', { delivery_fee: num(v('#s-del')), free_delivery_above: num(v('#s-free')), tax_pct: num(v('#s-tax')), service_charge_pct: num(v('#s-svc')), min_online_order: num(v('#s-min')) });
   await saveSetting('payment_methods', v('#s-pm').split('\n').map(x => x.trim()).filter(Boolean));
   if (canPerm) {
@@ -1744,6 +1809,7 @@ const ANAV = [
   ['invreports', '📈', 'Inventory Reports'],
   ['~gen', '', '⚙️ General'],
   ['coupons', '🎟️', 'Coupons'],
+  ['website', '🌐', 'Website Content'],
   ['reports', '📊', 'Reports'],
   ['tables', '🍽️', 'Tables'],
   ['riders', '🏍️', 'Riders & Incentives'],
@@ -1784,6 +1850,7 @@ function buildSidebar() {
   $('#sidebar').innerHTML = `${logoHTML(96)}<div class="pill" style="align-self:center;margin-bottom:8px;background:var(--brand);color:var(--brand-ink);border-color:var(--brand)">${t('ADMIN PANEL')}</div>
     ${ANAV.map(([id, ic, l]) => id[0] === '~' ? `<div class="nav-group">${t(l)}</div>` : `<button class="nav-item ${A.view === id ? 'on' : ''}" data-nav="${id}"><span class="ic">${ic}</span><span>${t(l)}</span>${id === 'invdash' && A.lowStock ? `<span class="badge">${A.lowStock}</span>` : ''}</button>`).join('')}
     <a class="nav-item" href="index.html" target="_blank"><span class="ic">🖥️</span><span>${t('Open POS')}</span></a>
+    <a class="nav-item" href="order.html" target="_blank"><span class="ic">🌐</span><span>${t('Open Website')}</span></a>
     <a class="nav-item" href="staff.html" target="_blank"><span class="ic">👥</span><span>${t('Staff Management')}</span></a>
     <div class="nav-sep"></div><button class="nav-item" data-act="logout"><span class="ic">⎋</span><span>${t('Logout')}</span></button>`;
 }
@@ -1930,7 +1997,15 @@ VIEWS.menu = {
       <label class="f">${t('Name (Urdu)')}<input id="p-nameur" value="${esc(p?.name_ur || '')}" dir="rtl"></label>
       <label class="f full">${t('Description')}<input id="p-desc" value="${esc(p?.description || '')}"></label>
       <label class="f">${t('Base Price (Rs.)')} <span class="sm muted">(${t('ignored if sizes are added below')})</span><input id="p-price" type="number" value="${p?.price ?? 0}"></label>
-      <label class="f">${t('Image URL')}<input id="p-img" value="${esc(p?.image_url || '')}" placeholder="https://…"></label></div>
+      <label class="f full">${t('Picture')}
+        <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+          <img id="p-imgprev" src="${esc(p?.image_url || '')}" style="width:64px;height:64px;border-radius:14px;object-fit:cover;background:var(--surface2);border:2px solid var(--line);${p?.image_url ? '' : 'display:none'}">
+          <input id="p-imgfile" type="file" accept="image/*">
+          <button type="button" class="btn sm ghost" id="p-imgclear" ${p?.image_url ? '' : 'style="display:none"'}>🗑 ${t('Remove')}</button>
+        </div>
+        <input id="p-img" type="hidden" value="${esc(p?.image_url || '')}">
+        <div class="sm muted">${t('Upload a photo from your phone or computer (auto-resized).')}</div>
+      </label></div>
       <div class="muted b sm mt">${t('Sizes / Variants')} <span class="sm">(${t('leave empty for single-price item')})</span></div>
       <div id="p-vars"></div><button type="button" class="btn sm ghost" id="p-addvar">➕ ${t('Add Size')}</button>
       <div class="row wrap mt2">${p ? `<button class="btn danger" id="p-del">${t('Delete Product')}</button>` : ''}<button class="btn primary grow" id="p-save">${t('Save Product')}</button></div>`
@@ -1948,6 +2023,14 @@ VIEWS.menu = {
     };
     paintVars();
     $('#p-addvar', w).onclick = () => { varRows.push({ name: '', name_ur: '', price: 0 }); paintVars(); };
+    $('#p-imgfile', w).onchange = e => safe(async () => {
+      const f = e.target.files[0]; if (!f) return;
+      const dataUrl = await resizeImageFile(f, 900, 0.72);
+      $('#p-img', w).value = dataUrl;
+      $('#p-imgprev', w).src = dataUrl; $('#p-imgprev', w).style.display = '';
+      $('#p-imgclear', w).style.display = '';
+    });
+    $('#p-imgclear', w).onclick = () => { $('#p-img', w).value = ''; $('#p-imgfile', w).value = ''; $('#p-imgprev', w).style.display = 'none'; $('#p-imgclear', w).style.display = 'none'; };
     $('#p-save', w).onclick = ev => safe(async () => {
       const payload = { category_id: +$('#p-cat', w).value, sort: num($('#p-sort', w).value), name: $('#p-name', w).value.trim(), name_ur: $('#p-nameur', w).value.trim() || null, description: $('#p-desc', w).value.trim() || null, price: num($('#p-price', w).value), image_url: $('#p-img', w).value.trim() || null };
       if (!payload.name) throw new Error(t('Enter product name'));
@@ -2271,6 +2354,54 @@ VIEWS.users = {
 };
 
 /* ---------- BUSINESS SETTINGS ---------- */
+VIEWS.website = {
+  render() {
+    const S = Object.assign({ hours_open: '10:00', hours_close: '03:00', eta: '30-45 min', delivery_areas: [], featured_ids: [], deals: [] }, A.settings.site || {});
+    const chg = A.settings.charges || {};
+    const f = (id, label, val, ph = '') => `<label class="f">${t(label)}<input id="${id}" value="${esc(val ?? '')}" placeholder="${esc(ph)}"></label>`;
+    const ta = (id, label, val, rows = 4, ph = '') => `<label class="f full">${t(label)}<textarea id="${id}" rows="${rows}" placeholder="${esc(ph)}">${esc(val ?? '')}</textarea></label>`;
+    $('#view').innerHTML = `<div class="view-head"><h2>🌐 ${t('Website Content')}</h2><a class="btn ghost" href="order.html" target="_blank">${t('Open Website')} ↗</a></div>
+    <div class="col">
+      <div class="card"><h3>${t('Home banner & offer')}</h3><div class="form-grid">
+        ${f('w-ht', 'Banner title', S.hero_title, 'Fresh Pizza & Burgers')}${f('w-hs', 'Banner subtitle', S.hero_sub)}
+        ${f('w-hi', 'Banner image URL (optional)', S.hero_image)}${f('w-offer', 'Offer strip text', S.offer_text, 'Buy 1 Get 1 every Friday!')}</div></div>
+      <div class="card"><h3>${t('Open / Closed & Delivery')}</h3><div class="form-grid">
+        <label class="f">${t('Opens at')}<input id="w-ho" type="time" value="${esc(S.hours_open)}"></label>
+        <label class="f">${t('Closes at')}<input id="w-hc" type="time" value="${esc(S.hours_close)}"></label>
+        ${f('w-eta', 'Delivery time (shown to customers)', S.eta)}${f('w-cm', 'Message when closed', S.closed_message)}
+        <label class="f">${t('Minimum online order')}<input id="w-min" type="number" value="${esc(chg.min_online_order ?? 0)}"></label>
+        <label class="f">${t('Default delivery fee')}<input id="w-fee" type="number" value="${esc(chg.delivery_fee ?? 0)}"></label>
+        ${ta('w-areas', 'Delivery areas — one per line: Area name | fee', (S.delivery_areas || []).map(a => `${a.name} | ${a.fee}`).join('\n'), 5, 'Satellite Town | 100\nCantt | 150')}</div>
+        <p class="hint">${t('Leave areas empty to use the default delivery fee. Opening hours are enforced on the server too.')}</p></div>
+      <div class="card"><h3>${t('Deals page')}</h3>
+        ${ta('w-deals', 'One deal per line: Title | Details | PROMO CODE (code optional)', (S.deals || []).map(d => [d.title, d.text, d.code || ''].join(' | ')).join('\n'), 5, 'Family Deal | 2 large pizzas + drinks | FAMILY10')}
+        <p class="hint">${t('Also: any category with "Deal" or "Combo" in its name shows its items on the Deals page.')}</p></div>
+      <div class="card"><h3>${t('Featured items on Home')}</h3>
+        <div class="feat-grid">${A.products.filter(p => p.is_active !== false).map(p => `<label class="chk"><input type="checkbox" data-feat="${p.id}" ${(S.featured_ids || []).includes(p.id) ? 'checked' : ''}> ${esc(p.name)}</label>`).join('')}</div></div>
+      <div class="card"><h3>${t('About & Contact')}</h3><div class="form-grid">
+        ${ta('w-about', 'About us', S.about, 5)}${ta('w-story', 'Our story (optional)', S.story, 4)}
+        ${f('w-wa', 'WhatsApp number', S.whatsapp, '923001234567')}${f('w-map', 'Google Maps link', S.maps_url)}
+        ${f('w-fb', 'Facebook link', S.facebook)}${f('w-ig', 'Instagram link', S.instagram)}${f('w-tt', 'TikTok link', S.tiktok)}</div></div>
+      <button class="btn primary lg" id="w-save">${t('Save website')}</button>
+    </div>`;
+    $('#w-save').onclick = ev => safe(async () => {
+      const v = id => $(id).value.trim();
+      const lines = id => v(id).split('\n').map(x => x.trim()).filter(Boolean);
+      const site = {
+        hero_title: v('#w-ht'), hero_sub: v('#w-hs'), hero_image: v('#w-hi'), offer_text: v('#w-offer'),
+        hours_open: v('#w-ho') || '12:00', hours_close: v('#w-hc') || '02:00', eta: v('#w-eta'), closed_message: v('#w-cm'),
+        delivery_areas: lines('#w-areas').map(l => { const [n, fee] = l.split('|').map(x => x.trim()); return { name: n, fee: num(fee) }; }).filter(a => a.name),
+        deals: lines('#w-deals').map(l => { const [title, text, code] = l.split('|').map(x => x.trim()); return { title, text: text || '', code: (code || '').toUpperCase() }; }).filter(d => d.title),
+        featured_ids: $$('[data-feat]').filter(c => c.checked).map(c => +c.dataset.feat),
+        about: v('#w-about'), story: v('#w-story'), whatsapp: v('#w-wa'), maps_url: v('#w-map'), facebook: v('#w-fb'), instagram: v('#w-ig'), tiktok: v('#w-tt')
+      };
+      await saveSetting('site', site);
+      await saveSetting('charges', Object.assign({}, A.settings.charges || {}, { min_online_order: num(v('#w-min')), delivery_fee: num(v('#w-fee')) }));
+      toast(t('Saved')); await loadAll();
+    }, { busy: ev.currentTarget });
+  }
+};
+
 VIEWS.settings = {
   async render() {
     $('#view').innerHTML = `<div class="view-head"><h2>${t('Business Settings')}</h2>${A.role === 'super_admin' ? `<button class="btn primary" id="bk-full">📥 ${t('Download Full Backup')}</button>` : ''}</div><div id="bs-body"></div>`;
@@ -2351,14 +2482,33 @@ function itemModal(it) {
     <label class="f">${t('Storage Location')}<input id="im-loc" value="${esc(it?.storage_location || '')}"></label>
     <label class="f">${t('Status')}<select id="im-act"><option value="1" ${it?.is_active !== false ? 'selected' : ''}>${t('Active')}</option><option value="0" ${it?.is_active === false ? 'selected' : ''}>${t('Inactive')}</option></select></label>
     ${it ? '' : `<label class="f">${t('Opening Stock (optional)')}<input id="im-open" type="number" min="0" step="any"></label><label class="f">${t('Opening Expiry (optional)')}<input id="im-openexp" type="date"></label>`}
-    <label class="f" style="grid-column:1/-1">${t('Notes')}<input id="im-notes" value="${esc(it?.notes || '')}"></label></div>
+    <label class="f" style="grid-column:1/-1">${t('Notes')}<input id="im-notes" value="${esc(it?.notes || '')}"></label>
+    ${it ? '' : `<label class="f chk" style="grid-column:1/-1"><input type="checkbox" id="im-direct"> ${t('This item is sold as-is on the menu (e.g. cold drink, water bottle) — auto-create its recipe')}</label>
+    <div id="im-direct-box" style="grid-column:1/-1;display:none" class="form-grid">
+      <label class="f">${t('Menu Product')}<select id="im-direct-prod"><option value="__new__">➕ ${t('Create new product with this name')}</option>${A.products.map(pp => `<option value="${pp.id}">${esc(pick(pp))}</option>`).join('')}</select></label>
+      <label class="f" id="im-direct-catwrap">${t('Menu Category')}<select id="im-direct-cat">${A.cats.map(c => `<option value="${c.id}">${esc(pick(c))}</option>`).join('')}</select></label>
+      <label class="f" id="im-direct-pricewrap">${t('Selling Price (Rs.)')}<input id="im-direct-price" type="number" min="0" step="any" value="0"></label>
+    </div>`}
     <button class="btn primary lg" id="im-save">${t('Save')}</button>`
   });
+  const dBox = $('#im-direct-box', w), dChk = $('#im-direct', w), dProd = $('#im-direct-prod', w);
+  if (dChk) {
+    dChk.onchange = () => { dBox.style.display = dChk.checked ? '' : 'none'; };
+    dProd.onchange = () => { const isNew = dProd.value === '__new__'; $('#im-direct-catwrap', w).style.display = isNew ? '' : 'none'; $('#im-direct-pricewrap', w).style.display = isNew ? '' : 'none'; };
+  }
   $('#im-save', w).onclick = ev => safe(async () => {
     const name = $('#im-name', w).value.trim(); if (!name) return toast(t('Enter item name'), 'err');
     const row = await rpc('inv_save', { p_table: 'inventory_items', p: { id: it?.id, name, code: $('#im-code', w).value.trim() || null, category_id: $('#im-cat', w).value ? +$('#im-cat', w).value : null, unit: $('#im-unit', w).value, purchase_price: num($('#im-price', w).value), min_stock: num($('#im-min', w).value), max_stock: $('#im-max', w).value ? num($('#im-max', w).value) : null, supplier_id: $('#im-sup', w).value ? +$('#im-sup', w).value : null, storage_location: $('#im-loc', w).value.trim() || null, is_active: $('#im-act', w).value === '1', notes: $('#im-notes', w).value.trim() || null } });
     if (!it && $('#im-open', w) && num($('#im-open', w).value) > 0) {
       await rpc('adjust_stock', { p_item: row.id, p_delta: num($('#im-open', w).value), p_reason: 'Opening Stock', p_notes: null, p_cost: num($('#im-price', w).value) || null, p_expiry: $('#im-openexp', w).value || null });
+    }
+    if (dChk && dChk.checked) {
+      let pid = dProd.value;
+      if (pid === '__new__') {
+        const [newP] = await q(sb.from('products').insert({ category_id: +$('#im-direct-cat', w).value, name, price: num($('#im-direct-price', w).value), sort: 1 }).select());
+        pid = newP.id;
+      } else pid = +pid;
+      await rpc('save_recipe', { p_product: pid, p_items: [{ item_id: row.id, qty: 1, unit: $('#im-unit', w).value }], p_variant_name: null });
     }
     Modal.closeAll(); toast(t('Item saved')); refresh();
   }, { busy: ev.currentTarget });
@@ -2581,8 +2731,16 @@ VIEWS.purchist = {
     $('[data-go]').onclick = () => location.hash = '#/purchase';
     const paint = () => {
       const ql = this.qs.toLowerCase(); const list = rows.filter(r => !ql || `${r.purchase_no} ${r.invoice_no} ${supName(r.supplier_id)}`.toLowerCase().includes(ql));
-      $('#ph-body').innerHTML = tbl([t('Purchase No'), t('Date'), t('Supplier'), t('Invoice'), t('Total'), t('Paid'), t('Remaining'), t('Status')], list.map(r => [`<b>${esc(r.purchase_no)}</b>`, fmtD(r.purchase_date), esc(supName(r.supplier_id)), esc(r.invoice_no || '—'), money(r.total), money(r.paid_amount), money(num(r.total) - num(r.paid_amount)), `<span class="pill ${{ paid: 'ok', partial: 'warn', unpaid: 'bad' }[r.payment_status]}">${t(r.payment_status)}</span>`]), list.map(r => `class="click" data-pid="${r.id}"`));
+      $('#ph-body').innerHTML = tbl([t('Purchase No'), t('Date'), t('Supplier'), t('Invoice'), t('Total'), t('Paid'), t('Remaining'), t('Status'), ''], list.map(r => [`<b>${esc(r.purchase_no)}</b>`, fmtD(r.purchase_date), esc(supName(r.supplier_id)), esc(r.invoice_no || '—'), money(r.total), money(r.paid_amount), money(num(r.total) - num(r.paid_amount)), `<span class="pill ${{ paid: 'ok', partial: 'warn', unpaid: 'bad' }[r.payment_status]}">${t(r.payment_status)}</span>`, r.payment_status === 'paid' ? `<button class="btn sm ghost" data-tog="${r.id}">${t('Mark Unpaid')}</button>` : `<button class="btn sm primary" data-tog="${r.id}">${t('Mark Paid')}</button>`]), list.map(r => `class="click" data-pid="${r.id}"`));
       $$('[data-pid]').forEach(tr => tr.onclick = () => this.detail(rows.find(r => r.id === +tr.dataset.pid)));
+      $$('[data-tog]').forEach(b => b.onclick = e => safe(async () => {
+        e.stopPropagation();
+        const r = rows.find(x => x.id === +b.dataset.tog);
+        const target = r.payment_status === 'paid' ? 0 : num(r.total);
+        await rpc('set_purchase_payment', { p_purchase: r.id, p_paid_amount: target });
+        r.paid_amount = target; r.payment_status = target >= num(r.total) && num(r.total) > 0 ? 'paid' : target > 0 ? 'partial' : 'unpaid';
+        toast(t('Payment status updated')); paint();
+      }, { busy: e.currentTarget }));
     };
     $('#ph-q').oninput = debounce(e => { this.qs = e.target.value; paint(); }, 200); paint();
   }); },
@@ -2590,10 +2748,25 @@ VIEWS.purchist = {
     const [its, pays] = await Promise.all([q(sb.from('purchase_items').select('*').eq('purchase_id', p.id)), q(sb.from('supplier_payments').select('*').eq('purchase_id', p.id).order('created_at'))]);
     const w = Modal.open({ title: `${p.purchase_no}`, wide: true, html: `<p>${fmtD(p.purchase_date)} · ${esc(supName(p.supplier_id))} · ${t('Invoice')}: ${esc(p.invoice_no || '—')}</p>
       ${tbl([t('Item'), t('Qty'), t('Unit Price'), t('Total'), t('Expiry')], its.map(i => [esc((itemById(i.item_id) || {}).name), fmtQ(i.qty, i.unit), money(i.unit_price), money(i.line_total), fmtD(i.expiry_date)]))}
-      <p class="mt"><b>${t('TOTAL')}: ${money(p.total)}</b> · ${t('Paid')}: ${money(p.paid_amount)} · ${t('Remaining')}: <b>${money(num(p.total) - num(p.paid_amount))}</b></p>
-      ${pays.length ? `<div class="sm muted">${pays.map(x => `${fmtDT(x.created_at)} — ${money(x.amount)} (${esc(x.method || '')})`).join('<br>')}</div>` : ''}
-      ${num(p.total) > num(p.paid_amount) && p.supplier_id ? `<button class="btn primary mt" id="pd-pay">💳 ${t('Add Payment')}</button>` : ''}` });
+      <p class="mt"><b>${t('TOTAL')}: ${money(p.total)}</b> · ${t('Paid')}: <span id="pd-paid">${money(p.paid_amount)}</span> · ${t('Remaining')}: <b id="pd-rem">${money(num(p.total) - num(p.paid_amount))}</b> · <span id="pd-status"><span class="pill ${{ paid: 'ok', partial: 'warn', unpaid: 'bad' }[p.payment_status]}">${t(p.payment_status)}</span></span></p>
+      ${pays.length ? `<div class="sm muted" id="pd-pays">${pays.map(x => `${fmtDT(x.created_at)} — ${money(x.amount)} (${esc(x.method || '')})`).join('<br>')}</div>` : ''}
+      <div class="row gap6 mt">
+        <button class="btn primary" id="pd-editpay">✏️ ${t('Edit Payment')}</button>
+        ${p.supplier_id ? `<button class="btn ghost" id="pd-pay">💳 ${t('Add Payment')}</button>` : ''}
+      </div>` });
     const b = $('#pd-pay', w); if (b) b.onclick = () => { Modal.close(w); payModal(p.supplier_id, p); };
+    $('#pd-editpay', w).onclick = () => {
+      const w2 = Modal.open({ title: `${t('Edit Payment')} — ${p.purchase_no}`, html: `
+        <p class="sm muted">${t('TOTAL')}: <b>${money(p.total)}</b></p>
+        <label class="f">${t('Paid Amount (Rs.)')}<input id="ep-amt" type="number" min="0" max="${p.total}" step="any" value="${num(p.paid_amount)}"></label>
+        <button class="btn primary lg block" id="ep-go">${t('Save')}</button>` });
+      $('#ep-go', w2).onclick = ev => safe(async () => {
+        const v = num($('#ep-amt', w2).value);
+        await rpc('set_purchase_payment', { p_purchase: p.id, p_paid_amount: v });
+        p.paid_amount = Math.min(v, num(p.total)); p.payment_status = p.paid_amount >= num(p.total) && num(p.total) > 0 ? 'paid' : p.paid_amount > 0 ? 'partial' : 'unpaid';
+        Modal.close(w2); Modal.close(w); toast(t('Payment status updated')); this.render();
+      }, { busy: ev.currentTarget });
+    };
   }
 };
 
@@ -2663,18 +2836,41 @@ VIEWS.recipes = {
   render() { return ivView('Recipes & Cost', async () => {
     const [rc, ri] = await Promise.all([q(sb.from('recipes').select('*')), q(sb.from('recipe_items').select('*'))]);
     this.rc = rc; this.ri = ri;
-    const rows = A.products.map(p => {
-      const r = rc.find(x => x.product_id === p.id); const its = r ? ri.filter(x => x.recipe_id === r.id) : [];
-      const cost = its.reduce((s, x) => { const it = itemById(x.item_id) || {}; return s + uconv(num(x.qty), x.unit, it.unit) * num(it.purchase_price); }, 0);
-      const vs = A.variants.filter(v => v.product_id === p.id); const price = vs.length ? Math.min(...vs.map(v => num(v.price))) : num(p.price);
-      return [esc(pick(p)), esc(pick(A.cats.find(c => c.id === p.category_id) || {})), its.length ? `${its.length} ${t('ingredients')}` : `<span class="muted">${t('No recipe')}</span>`, its.length ? money(cost) : '—', `${vs.length ? t('from') + ' ' : ''}${money(price)}`, its.length ? `${money(price - cost)} (${price ? Math.round((price - cost) / price * 100) : 0}%)` : '—', `<button class="btn sm ghost" data-r="${p.id}">${its.length ? t('Edit') : t('Add recipe')}</button>`];
+    const findRecipe = (pid, vname) => rc.find(x => x.product_id === pid && (x.variant_name || null) === (vname || null));
+    const rows = [];
+    A.products.forEach(p => {
+      const vs = A.variants.filter(v => v.product_id === p.id).sort((a, b) => a.sort - b.sort);
+      const entries = vs.length ? vs.map(v => ({ vname: v.name, label: `${pick(p)} — ${pick(v, 'name')}`, price: num(v.price) })) : [{ vname: null, label: pick(p), price: num(p.price) }];
+      entries.forEach(e => {
+        const r = findRecipe(p.id, e.vname); const its = r ? ri.filter(x => x.recipe_id === r.id) : [];
+        const cost = its.reduce((s, x) => { const it = itemById(x.item_id) || {}; return s + uconv(num(x.qty), x.unit, it.unit) * num(it.purchase_price); }, 0);
+        rows.push([esc(e.label), esc(pick(A.cats.find(c => c.id === p.category_id) || {})), its.length ? `${its.length} ${t('ingredients')}` : `<span class="muted">${t('No recipe')}</span>`, its.length ? money(cost) : '—', money(e.price), its.length ? `${money(e.price - cost)} (${e.price ? Math.round((e.price - cost) / e.price * 100) : 0}%)` : '—', `<button class="btn sm ghost" data-r="${p.id}" data-v="${esc(e.vname || '')}">${its.length ? t('Edit') : t('Add recipe')}</button>`]);
+      });
     });
-    $('#view').innerHTML = head('Recipes & Cost') + `<p class="sm muted">${t('Recipe is per product (all sizes). Stock is deducted automatically when the product is sold. Margin uses the lowest size price.')}</p>` + tbl([t('Product'), t('Category'), t('Recipe'), t('Ingredient Cost'), t('Selling Price'), t('Gross Margin'), ''], rows);
-    $$('[data-r]').forEach(b => b.onclick = () => this.modal(A.products.find(p => p.id === +b.dataset.r)));
+    $('#view').innerHTML = head('Recipes & Cost', `<button class="btn primary" id="rc-new">➕ ${t('New Recipe')}</button>`) + `<p class="sm muted">${t('Each size can now have its own recipe/quantities. Stock is deducted automatically when the product is sold.')}</p>` + tbl([t('Product'), t('Category'), t('Recipe'), t('Ingredient Cost'), t('Selling Price'), t('Gross Margin'), ''], rows);
+    $$('[data-r]').forEach(b => b.onclick = () => this.modal(A.products.find(p => p.id === +b.dataset.r), b.dataset.v || null));
+    $('#rc-new').onclick = () => this.pickModal();
   }); },
-  modal(p) {
-    const r = this.rc.find(x => x.product_id === p.id); const rows = r ? this.ri.filter(x => x.recipe_id === r.id).map(x => ({ item_id: x.item_id, qty: x.qty, unit: x.unit })) : [{}];
-    const w = Modal.open({ title: `${t('Recipe')}: ${pick(p)}`, wide: true, html: `<div id="rc-rows"></div><button class="btn sm ghost" id="rc-add">➕ ${t('Add ingredient')}</button><p class="mt"><b>${t('Ingredient cost')}: <span id="rc-cost">Rs. 0</span></b></p><button class="btn primary lg" id="rc-save">${t('Save Recipe')}</button>` });
+  pickModal() {
+    const opts = [];
+    A.products.forEach(p => {
+      const vs = A.variants.filter(v => v.product_id === p.id).sort((a, b) => a.sort - b.sort);
+      if (vs.length) vs.forEach(v => opts.push({ pid: p.id, vname: v.name, label: `${pick(p)} — ${pick(v, 'name')}` }));
+      else opts.push({ pid: p.id, vname: '', label: pick(p) });
+    });
+    const w = Modal.open({ title: t('New Recipe'), html: `
+      <label class="f">${t('Product')}<select id="rn-p">${opts.map((o, i) => `<option value="${i}">${esc(o.label)}</option>`).join('')}</select></label>
+      <button class="btn primary lg block" id="rn-go">${t('Continue')}</button>` });
+    $('#rn-go', w).onclick = () => {
+      const o = opts[+$('#rn-p', w).value]; Modal.close(w);
+      this.modal(A.products.find(p => p.id === o.pid), o.vname || null);
+    };
+  },
+  modal(p, vname) {
+    const r = this.rc.find(x => x.product_id === p.id && (x.variant_name || null) === (vname || null));
+    const rows = r ? this.ri.filter(x => x.recipe_id === r.id).map(x => ({ item_id: x.item_id, qty: x.qty, unit: x.unit })) : [{}];
+    const title = vname ? `${t('Recipe')}: ${pick(p)} — ${vname}` : `${t('Recipe')}: ${pick(p)}`;
+    const w = Modal.open({ title, wide: true, html: `<div id="rc-rows"></div><button class="btn sm ghost" id="rc-add">➕ ${t('Add ingredient')}</button><p class="mt"><b>${t('Ingredient cost')}: <span id="rc-cost">Rs. 0</span></b></p><button class="btn primary lg" id="rc-save">${t('Save Recipe')}</button>` });
     const paint = () => {
       $('#rc-rows', w).innerHTML = rows.map((x, i) => `<div class="row gap6 mb" data-i="${i}"><select data-f="item_id" style="flex:2"><option value="">— ${t('ingredient')} —</option>${itemOpts(x.item_id)}</select><input data-f="qty" type="number" min="0" step="any" placeholder="${t('Qty')}" style="width:90px" value="${x.qty ?? ''}"><select data-f="unit" style="width:100px">${unitOpts(x.unit || 'Gram')}</select><button class="btn sm ghost" data-rm="${i}">🗑</button></div>`).join('');
       $$('[data-i]', w).forEach(d => { const i = +d.dataset.i; $$('[data-f]', d).forEach(el => el.oninput = el.onchange = () => { rows[i][el.dataset.f] = el.value; if (el.dataset.f === 'item_id' && !rows[i].unit_set) { const it = itemById(el.value); if (it) { rows[i].unit = ['KG'].includes(it.unit) ? 'Gram' : it.unit === 'Liter' ? 'ML' : it.unit; $('[data-f="unit"]', d).value = rows[i].unit; } } cost(); }); $('[data-rm]', d).onclick = () => { rows.splice(i, 1); paint(); }; });
@@ -2684,7 +2880,7 @@ VIEWS.recipes = {
     $('#rc-add', w).onclick = () => { rows.push({}); paint(); };
     $('#rc-save', w).onclick = ev => safe(async () => {
       const items = rows.filter(x => x.item_id && num(x.qty) > 0).map(x => ({ item_id: +x.item_id, qty: num(x.qty), unit: x.unit || (itemById(x.item_id) || {}).unit }));
-      await rpc('save_recipe', { p_product: p.id, p_items: items }); Modal.closeAll(); toast(t('Recipe saved')); refresh();
+      await rpc('save_recipe', { p_product: p.id, p_items: items, p_variant_name: vname || null }); Modal.closeAll(); toast(t('Recipe saved')); refresh();
     }, { busy: ev.currentTarget });
     paint();
   }
@@ -2692,15 +2888,38 @@ VIEWS.recipes = {
 
 /* ---------- 9) INVENTORY REPORTS ---------- */
 VIEWS.invreports = {
-  type: 'stock', from: isoDate(addDays(new Date(), -30)), to: isoDate(new Date()),
-  TYPES: [['stock', 'Current Stock'], ['valuation', 'Stock Valuation'], ['low', 'Low / Out of Stock'], ['expiry', 'Expiry Report'], ['p_daily', 'Purchases — Daily'], ['p_monthly', 'Purchases — Monthly'], ['p_supplier', 'Purchases — Supplier-wise'], ['p_item', 'Purchases — Item-wise'], ['p_category', 'Purchases — Category-wise'], ['unpaid', 'Unpaid / Outstanding'], ['consumption', 'Consumption (item-wise)'], ['waste', 'Waste Report']],
+  type: 'canmake', from: isoDate(addDays(new Date(), -30)), to: isoDate(new Date()),
+  TYPES: [['canmake', 'Can Make Now (from current stock)'], ['stock', 'Current Stock'], ['valuation', 'Stock Valuation'], ['low', 'Low / Out of Stock'], ['expiry', 'Expiry Report'], ['p_daily', 'Purchases — Daily'], ['p_monthly', 'Purchases — Monthly'], ['p_supplier', 'Purchases — Supplier-wise'], ['p_item', 'Purchases — Item-wise'], ['p_category', 'Purchases — Category-wise'], ['unpaid', 'Unpaid / Outstanding'], ['consumption', 'Consumption (item-wise)'], ['waste', 'Waste Report']],
   render() { return ivView('Inventory Reports', async () => {
     $('#view').innerHTML = head('Inventory Reports') + `<div class="row wrap gap6 mb"><select id="ir-type">${this.TYPES.map(([k, l]) => `<option value="${k}" ${k === this.type ? 'selected' : ''}>${t(l)}</option>`).join('')}</select><label class="sm">${t('From')} <input type="date" id="ir-from" value="${this.from}"></label><label class="sm">${t('To')} <input type="date" id="ir-to" value="${this.to}"></label><button class="btn sm primary" id="ir-go">${t('Apply')}</button><button class="btn sm ghost" id="ir-print">🖨 ${t('Print')}</button><button class="btn sm ghost" id="ir-csv">⬇ ${t('Export Excel')}</button></div><div id="ir-body"></div>`;
     $('#ir-go').onclick = () => { this.type = $('#ir-type').value; this.from = $('#ir-from').value; this.to = $('#ir-to').value; this.render(); };
     const from = this.from, to = this.to, fISO = new Date(from + 'T00:00:00').toISOString(), tISO = new Date(to + 'T23:59:59').toISOString(); let cols, rows;
     const grp = (list, keyFn, init, add) => { const g = {}; list.forEach(r => { const k = keyFn(r); g[k] = g[k] || init(k); add(g[k], r); }); return Object.values(g); };
     const T = this.type;
-    if (['stock', 'valuation', 'low'].includes(T)) {
+    if (T === 'canmake') {
+      const [rc, ri] = await Promise.all([q(sb.from('recipes').select('*')), q(sb.from('recipe_items').select('*'))]);
+      const findRecipe = (pid, vname) => rc.find(x => x.product_id === pid && (x.variant_name || null) === (vname || null));
+      rows = [];
+      A.products.forEach(p => {
+        const vs = A.variants.filter(v => v.product_id === p.id).sort((a, b) => a.sort - b.sort);
+        const entries = vs.length ? vs.map(v => ({ vname: v.name, label: `${pick(p)} — ${pick(v, 'name')}` })) : [{ vname: null, label: pick(p) }];
+        entries.forEach(e => {
+          const r = findRecipe(p.id, e.vname); const its = r ? ri.filter(x => x.recipe_id === r.id) : [];
+          if (!its.length) { rows.push({ item: e.label, can: null, limit: t('No recipe set') }); return; }
+          let best = Infinity, limitName = '';
+          its.forEach(x => {
+            const it = itemById(x.item_id); if (!it) return;
+            const need = uconv(num(x.qty), x.unit, it.unit);
+            if (need <= 0) return;
+            const n = Math.floor(Math.max(0, num(it.current_stock)) / need);
+            if (n < best) { best = n; limitName = it.name; }
+          });
+          rows.push({ item: e.label, can: best === Infinity ? null : best, limit: best === Infinity ? '—' : limitName });
+        });
+      });
+      rows.sort((a, z) => (a.can ?? 999999) - (z.can ?? 999999));
+      cols = [{ label: 'Product', key: 'item' }, { label: 'Can make now', get: r => r.can === null ? '—' : r.can }, { label: 'Limited by', key: 'limit' }];
+    } else if (['stock', 'valuation', 'low'].includes(T)) {
       rows = IV.items.filter(i => T !== 'low' || itemStatus(i) !== 'in'); const tot = rows.reduce((s, i) => s + Math.max(0, num(i.current_stock)) * num(i.purchase_price), 0);
       cols = [{ label: 'Code', key: 'code' }, { label: 'Item', key: 'name' }, { label: 'Category', get: i => catName(i.category_id) }, { label: 'Stock', get: i => fmtQ(i.current_stock, i.unit) }, { label: 'Minimum', get: i => fmtQ(i.min_stock, i.unit) }, { label: 'Cost/unit', get: i => money(i.purchase_price) }, { label: 'Value', get: i => money(Math.max(0, num(i.current_stock)) * num(i.purchase_price)) }, { label: 'Status', get: i => itemStatus(i) }];
       rows = [...rows, { name: 'TOTAL VALUE', code: '', current_stock: null, min_stock: null, purchase_price: null, _tot: tot }];

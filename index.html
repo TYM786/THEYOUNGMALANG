@@ -333,12 +333,14 @@ table.tbl { width: 100%; border-collapse: collapse; }
 [data-theme="dark"] .toast { background: #000; border: 1px solid #444; border-inline-start-width: 6px; }
 
 /* ---------- receipt ---------- */
-.rcpt-box { background: #fff; color: #000; padding: 14px; border-radius: 10px; border: 1.5px dashed #999; max-width: 340px; margin: 0 auto; width: 100%; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 900; -webkit-text-stroke: 0.3px #000; }
+.rcpt-box { position: relative; background: #fff; color: #000; padding: 14px; border-radius: 10px; border: 1.5px dashed #999; max-width: 340px; margin: 0 auto; width: 100%; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 900; -webkit-text-stroke: 0.3px #000; }
 .rcpt-box img { height: 70px; display: block; margin: 0 auto 6px; }
 .rcpt-box h4 { margin: 0; text-align: center; font-size: 16px; }
 .rcpt-box .c { text-align: center; } .rcpt-box table { width: 100%; border-collapse: collapse; }
 .rcpt-box td { padding: 2px 0; vertical-align: top; } .rcpt-box td.r { text-align: right; }
 .rcpt-box hr { border: 0; border-top: 1px dashed #000; margin: 6px 0; }
+.ym-stamp { position: absolute; top: 48%; left: 50%; width: 112px; height: 112px; margin: -56px 0 0 -56px; transform: rotate(-14deg); opacity: .88; mix-blend-mode: multiply; pointer-events: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; z-index: 5; }
+.ym-stamp svg { width: 100%; height: 100%; display: block; }
 .kt-box { background: #fff; color: #000; padding: 14px; border-radius: 10px; border: 1.5px dashed #999; max-width: 340px; margin: 0 auto; width: 100%; font-family: 'Courier New', monospace; font-size: 13px; font-weight: 900; -webkit-text-stroke: 0.3px #000; }
 .kt-box h4 { margin: 0 0 6px; text-align: center; font-size: 16px; letter-spacing: 1px; }
 .kt-box .row2 { display: flex; justify-content: space-between; font-weight: 700; }
@@ -348,6 +350,7 @@ table.tbl { width: 100%; border-collapse: collapse; }
 .rc-sec-label { text-align: center; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; font-size: 12px; color: var(--muted); margin: 14px 0 8px; }
 .rc-sec-label:first-child { margin-top: 0; }
 .rcpt-box .t td { font-weight: 800; font-size: 15px; }
+.rcpt-box .sw-credit { font-size: 9px; opacity: .6; margin-top: 6px; font-weight: 600; -webkit-text-stroke: 0; }
 
 /* ---------- customer site ---------- */
 .site-head { background: var(--surface); border-bottom: 2px solid var(--edge); padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 20; }
@@ -540,6 +543,8 @@ window.UR = {
  "Quick Actions": "فوری اقدامات",
  "Cash Sales": "نقد سیل",
  "Card Sales": "کارڈ سیل",
+ "Online Payment Sales": "آن لائن پیمنٹ سیل",
+ "QR Payment Sales": "کیو آر پیمنٹ سیل",
  "Dine-in Orders": "ڈائن اِن آرڈرز",
  "Takeaway Orders": "ٹیک اوے آرڈرز",
  "QR Orders": "QR آرڈرز",
@@ -595,6 +600,7 @@ window.UR = {
  "Reason": "وجہ",
  "Add Items": "آئٹمز شامل کریں",
  "Print Receipt": "رسید پرنٹ کریں",
+ "Print with PAID stamp": "PAID مہر کے ساتھ پرنٹ کریں",
  "Generate Bill": "بل بنائیں",
  "Close Table": "ٹیبل بند کریں",
  "Close this table? All its orders will be completed.": "یہ ٹیبل بند کریں؟ اس کے تمام آرڈرز مکمل ہو جائیں گے۔",
@@ -709,6 +715,8 @@ window.UR = {
  "Last 3 years": "پچھلے 3 سال",
  "All time": "تمام وقت",
  "Delivery Charges": "ڈیلیوری چارجز",
+ "Delivery charges updated": "ڈیلیوری چارجز اپڈیٹ ہو گئے",
+ "Discount updated": "رعایت اپڈیٹ ہو گئی",
  "Delivery amount (Rs.)": "ڈیلیوری رقم (روپے)",
  "Delivery charges vary by area/distance — enter the correct amount for this order.": "ڈیلیوری چارجز علاقے/فاصلے کے مطابق مختلف ہوتے ہیں — اس آرڈر کے لیے درست رقم درج کریں۔",
  "Use default": "ڈیفالٹ استعمال کریں",
@@ -847,6 +855,12 @@ window.UR = {
  "Tagline": "ٹیگ لائن",
  "Phone numbers (comma separated)": "فون نمبرز (کاما سے الگ)",
  "Receipt footer": "رسید فوٹر",
+ "Show logo on receipt": "رسید پر لوگو دکھائیں",
+ "Logo size on receipt (px, 20–160)": "رسید پر لوگو کا سائز (پکسل)",
+ "Show restaurant name on receipt": "رسید پر ریسٹورنٹ کا نام دکھائیں",
+ "Show tagline on receipt": "رسید پر ٹیگ لائن دکھائیں",
+ "Show software-provider line at the bottom of printed receipts": "پرنٹ شدہ رسید کے نیچے سافٹ ویئر فراہم کنندہ کی لائن دکھائیں",
+ "Software-provider line text": "سافٹ ویئر فراہم کنندہ کی لائن کا متن",
  "Charges": "چارجز",
  "Delivery charges (Rs.)": "ڈیلیوری چارجز (روپے)",
  "Free delivery above (Rs., 0 = never)": "مفت ڈیلیوری حد (روپے، 0 = کبھی نہیں)",
@@ -1020,6 +1034,10 @@ window.UR = {
  "Served By": "پیش کنندہ",
  "Served By (optional)": "پیش کنندہ (اختیاری)",
  "Service charge": "سروس چارج",
+ "Service charge amount (Rs.)": "سروس چارج کی رقم (روپے)",
+ "This amount is added on top of the bill, just like delivery charges or discount.": "یہ رقم بل میں شامل ہو جائے گی، بالکل ڈیلیوری چارجز یا ڈسکاؤنٹ کی طرح۔",
+ "Service charge updated": "سروس چارج اپڈیٹ ہو گیا",
+ "Remove": "ہٹا دیں",
  "Tax": "ٹیکس",
  "Track your order anytime with your order number and phone.": "اپنا آرڈر نمبر اور فون نمبر سے کبھی بھی ٹریک کریں۔",
  "Waiters / Staff": "ویٹرز / اسٹاف",
@@ -1388,6 +1406,18 @@ function openItemPicker({ product, variants, addons, initial, onAdd }) {
 }
 
 /* ---------- receipts ---------- */
+/* ---------- circular "PAID" stamp overlay (shown on receipt when fully paid) ---------- */
+function paidStampHTML() {
+  return `<div class="ym-stamp"><svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <defs><path id="ymStampArc" d="M 80,80 m -62,0 a 62,62 0 1,1 124,0 a 62,62 0 1,1 -124,0" /></defs>
+    <circle cx="80" cy="80" r="70" fill="none" stroke="#c0392b" stroke-width="3"/>
+    <circle cx="80" cy="80" r="54" fill="none" stroke="#c0392b" stroke-width="2"/>
+    <text font-size="12.5" font-weight="900" fill="#c0392b" letter-spacing="2" font-family="Arial, sans-serif">
+      <textPath href="#ymStampArc" xlink:href="#ymStampArc" startOffset="4%">★ THE YOUNG MALANG ★ THE YOUNG MALANG</textPath>
+    </text>
+    <text x="80" y="90" text-anchor="middle" font-size="28" font-weight="900" fill="#c0392b" font-family="Arial, sans-serif">PAID</text>
+  </svg></div>`;
+}
 const Receipt = {
   // who served this order, for the "Served By" line — dine-in/QR shows the waiter,
   // delivery shows the rider (with Rider ID), manual/takeaway shows the cashier who created it.
@@ -1403,13 +1433,14 @@ const Receipt = {
     // takeaway / walk-in / phone: show the cashier who created the order
     return o.creator ? { label: 'Served By', name: o.creator.full_name, id: o.creator.staff_id } : null;
   },
-  body(o, S = {}) {
+  body(o, S = {}, withStamp = false) {
     const r = S.restaurant || {}; const phones = (r.phones || BR.phones).join(' / ');
     const lines = (o.order_items || []).map(i => `<tr><td>${i.qty} × ${esc(i.name)}${i.variant ? ` (${esc(i.variant)})` : ''}${(i.addons || []).length ? `<br><small>+ ${i.addons.map(a => esc(a.name)).join(', ')}</small>` : ''}${i.note ? `<br><small>“${esc(i.note)}”</small>` : ''}</td><td class="r">${money(i.line_total)}</td></tr>`).join('');
     const row = (l, v) => `<tr><td>${l}</td><td class="r">${v}</td></tr>`;
     const sb = this.servedBy(o);
-    return `<div class="rcpt-box"><img src="${BR.logo}" alt=""><h4>${esc(r.name || BR.name)}</h4>
-      ${(r.tagline || BR.tagline) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
+    const stamp = (withStamp && o.payment_status === 'paid') ? paidStampHTML() : '';
+    return `<div class="rcpt-box">${stamp}${r.show_logo !== false ? `<img src="${BR.logo}" alt="" style="${r.logo_size ? `height:${num(r.logo_size)}px;` : ''}mix-blend-mode:multiply;background:#fff">` : ''}${r.show_name !== false ? `<h4>${esc(r.name || BR.name)}</h4>` : ''}
+      ${(r.show_tagline !== false && (r.tagline || BR.tagline)) ? `<div class="c tagline">${esc(r.tagline || BR.tagline)}</div>` : ''}
       <div class="c">${esc(r.address || BR.address)}<br>${esc(phones)}${r.ntn ? `<br>NTN: ${esc(r.ntn)}` : ''}</div><hr>
       <table>${row('Order No', `<b>${esc(o.order_no)}</b>`)}${row('Receipt No', esc(o.receipt_no || '—'))}${row('Date', fmtDT(o.created_at))}${row('Type', `${SRC[o.source] || o.source} / ${FUL[o.fulfillment] || o.fulfillment}`)}
       ${o.tbl ? row('Table', esc(o.tbl.code)) : ''}${o.customer_name ? row('Customer', esc(o.customer_name)) : ''}${o.phone ? row('Phone', esc(o.phone)) : ''}
@@ -1421,24 +1452,27 @@ const Receipt = {
       <tr class="t"><td>TOTAL</td><td class="r">${money(o.total)}</td></tr>
       ${row('Payment', esc(o.payment_method || '—'))}${row('Status', (o.payment_status || '').toUpperCase())}
       ${num(o.paid_amount) && o.payment_status !== 'paid' ? row('Paid', money(o.paid_amount)) + row('Remaining', money(num(o.total) - num(o.paid_amount))) : ''}</table><hr>
-      <div class="c">${esc(r.receipt_footer || 'Thank you!')}</div></div>`;
+      <div class="c">${esc(r.receipt_footer || 'Thank you!')}</div>
+      ${r.software_credit_enabled ? `<div class="c sw-credit">${esc(r.software_credit_text || 'POS Software Provided by MFJ 03469592120')}</div>` : ''}</div>`;
   },
   SIZES: { '58': { w: '58mm', max: '210px', font: '11px' }, '80': { w: '80mm', max: '300px', font: '12.5px' }, a4: { w: '210mm', max: '640px', font: '14px' } },
-  doc(o, S, autoPrint, size = '80') {
+  doc(o, S, autoPrint, size = '80', withStamp = false) {
     const sz = this.SIZES[size] || this.SIZES['80'];
     return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
       body{margin:0;padding:${size === 'a4' ? '24px' : '8px'};font-family:'Courier New',monospace;font-size:${sz.font};font-weight:900;-webkit-text-stroke:0.35px #000;color:#000;background:#fff}
-      .rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
+      .rcpt-box{position:relative;max-width:${sz.max};margin:0 auto;text-align:center}.rcpt-box img{height:64px;display:block;margin:0 auto 4px}h4{margin:0;text-align:center;font-size:15px}
       table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}td.r{text-align:right}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
-      @page{size:${size === 'a4' ? 'A4' : sz.w + ' auto'};margin:${size === 'a4' ? '14mm' : '3mm'}}</style></head><body>${this.body(o, S)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
+      .sw-credit{font-size:9px;opacity:.6;margin-top:6px;font-weight:600;-webkit-text-stroke:0}
+      .ym-stamp{position:absolute;top:48%;left:50%;width:112px;height:112px;margin:-56px 0 0 -56px;transform:rotate(-14deg);opacity:.88;mix-blend-mode:multiply;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;z-index:5}.ym-stamp svg{width:100%;height:100%;display:block}
+      @page{size:${size === 'a4' ? 'A4' : sz.w + ' auto'};margin:${size === 'a4' ? '14mm' : '3mm'}}</style></head><body>${this.body(o, S, withStamp)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
   },
   log(o, method) { rpc('log_receipt_print', { p_order: o.id, p_method: method }).catch(() => {}); },
-  print(o, S, size = '80') {
+  print(o, S, size = '80', withStamp = false) {
     const w = window.open('', '_blank', 'width=420,height=640'); if (!w) return toast(t('Allow pop-ups to print'), 'err');
-    w.document.write(this.doc(o, S, true, size)); w.document.close(); this.log(o, size === 'a4' ? 'A4' : size + 'mm');
+    w.document.write(this.doc(o, S, true, size, withStamp)); w.document.close(); this.log(o, size === 'a4' ? 'A4' : size + 'mm');
   },
-  download(o, S) {
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([this.doc(o, S, false, '80')], { type: 'text/html' })); a.download = `${o.receipt_no || o.order_no}.html`; a.click();
+  download(o, S, withStamp = false) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([this.doc(o, S, false, '80', withStamp)], { type: 'text/html' })); a.download = `${o.receipt_no || o.order_no}.html`; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000); this.log(o, 'digital');
   }
 };
@@ -1506,21 +1540,23 @@ const RiderSlip = {
 /* ---------- combined auto-print at checkout: kitchen ticket + counter receipt ----------
    Same printer -> one print job, two pages (page-break), one confirm.
    Different printers -> caller can still print each separately from its own screen. */
-function autoPrintOrderTickets(o, S, batchOnly, size = '58') {
+function autoPrintOrderTickets(o, S, batchOnly, size = '58', withStamp = false) {
   const w = window.open('', '_blank', 'width=420,height=640');
   if (!w) { toast(t('Allow pop-ups to print'), 'err'); return; }
   const sz = Receipt.SIZES[size] || Receipt.SIZES['58'];
   const pages = batchOnly
     ? `<div class="page">${KitchenTicket.body(o, batchOnly)}</div>`   // add-items: kitchen only, no need to reprint the counter receipt
-    : `<div class="page">${KitchenTicket.body(o)}</div><div class="page">${Receipt.body(o, S)}</div>`;
+    : `<div class="page">${KitchenTicket.body(o)}</div><div class="page">${Receipt.body(o, S, withStamp)}</div>`;
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.order_no)}</title><style>
     body{margin:0;padding:8px;font-family:'Courier New',monospace;font-size:${sz.font};font-weight:900;-webkit-text-stroke:0.35px #000;color:#000;background:#fff}
-    .kt-box,.rcpt-box{max-width:${sz.max};margin:0 auto;text-align:center}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
+    .kt-box,.rcpt-box{position:relative;max-width:${sz.max};margin:0 auto;text-align:center}h4{margin:0 0 6px;text-align:center;font-size:16px;letter-spacing:1px}
     .row2{display:flex;justify-content:space-between;font-weight:700}.ki{font-size:16px;font-weight:800;padding:4px 0}
     .add{font-size:12px;font-weight:600}.note{font-weight:700}.note.big{font-size:14px;border:1.5px dashed #000;padding:4px;margin-top:4px}
     .c{text-align:center}.sm{font-size:11px}hr{border:0;border-top:1px dashed #000;margin:6px 0}
     .rcpt-box img{height:56px;display:block;margin:0 auto 4px}table{width:100%;border-collapse:collapse}td{padding:2px 0;vertical-align:top;text-align:center}
     td.r{text-align:right}.t td{font-weight:800;font-size:14px}.tagline{font-size:12px;margin:2px 0 4px}
+    .sw-credit{font-size:9px;opacity:.6;margin-top:6px;font-weight:600;-webkit-text-stroke:0}
+    .ym-stamp{position:absolute;top:48%;left:50%;width:112px;height:112px;margin:-56px 0 0 -56px;transform:rotate(-14deg);opacity:.88;mix-blend-mode:multiply;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;z-index:5}.ym-stamp svg{width:100%;height:100%;display:block}
     .page{page-break-after:always;padding-bottom:10px}.page:last-child{page-break-after:auto}
     @page{size:${sz.w} auto;margin:3mm}</style></head><body>
     ${pages}
@@ -1559,7 +1595,13 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-name', 'Restaurant name', r.name || BR.name)}${f('s-tag', 'Tagline', r.tagline || BR.tagline)}
       ${f('s-ph', 'Phone numbers (comma separated)', (r.phones || BR.phones).join(', '))}${f('s-addr', 'Address', r.address || BR.address)}
       ${f('s-ntn', 'NTN (Tax Number)', r.ntn || '')}
-      <label class="f full">${t('Receipt footer')}<input id="s-foot" value="${esc(r.receipt_footer || '')}"></label></div></div>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showlogo" type="checkbox" ${r.show_logo !== false ? 'checked' : ''}> ${t('Show logo on receipt')}</label>
+      ${f('s-logosize', 'Logo size on receipt (px, 20–160)', r.logo_size || 64, 'number')}
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showname" type="checkbox" ${r.show_name !== false ? 'checked' : ''}> ${t('Show restaurant name on receipt')}</label>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-showtag" type="checkbox" ${r.show_tagline !== false ? 'checked' : ''}> ${t('Show tagline on receipt')}</label>
+      <label class="f full">${t('Receipt footer')}<input id="s-foot" value="${esc(r.receipt_footer || '')}"></label>
+      <label class="f full row sm" style="align-items:center;gap:8px"><input id="s-swcredit-on" type="checkbox" ${r.software_credit_enabled ? 'checked' : ''}> ${t('Show software-provider line at the bottom of printed receipts')}</label>
+      <label class="f full">${t('Software-provider line text')}<input id="s-swcredit-text" value="${esc(r.software_credit_text || 'POS Software Provided by MFJ 03469592120')}"></label></div></div>
     <div class="card"><h3>${t('Charges')}</h3><div class="form-grid">
       ${f('s-del', 'Delivery charges (Rs.)', c.delivery_fee ?? 0, 'number')}${f('s-free', 'Free delivery above (Rs., 0 = never)', c.free_delivery_above ?? 0, 'number')}
       ${f('s-tax', 'Tax %', c.tax_pct ?? 0, 'number')}${f('s-svc', 'Dine-in service charge %', c.service_charge_pct ?? 0, 'number')}
@@ -1581,7 +1623,7 @@ function settingsFormHTML(S, canPerm) {
 }
 async function saveSettingsForm(S, canPerm) {
   const v = id => $(id).value;
-  await saveSetting('restaurant', { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot') });
+  await saveSetting('restaurant', Object.assign({}, S.restaurant || {}, { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot'), show_logo: $('#s-showlogo').checked, show_name: $('#s-showname').checked, show_tagline: $('#s-showtag').checked, logo_size: Math.min(160, Math.max(20, num(v('#s-logosize')) || 64)), software_credit_enabled: $('#s-swcredit-on').checked, software_credit_text: v('#s-swcredit-text') }));
   await saveSetting('charges', { delivery_fee: num(v('#s-del')), free_delivery_above: num(v('#s-free')), tax_pct: num(v('#s-tax')), service_charge_pct: num(v('#s-svc')), min_online_order: num(v('#s-min')) });
   await saveSetting('payment_methods', v('#s-pm').split('\n').map(x => x.trim()).filter(Boolean));
   if (canPerm) {
@@ -1798,8 +1840,50 @@ const ACT = {
   },
   async additems(id) {
     const o = await getOrder(id); S.cart = newCart();
+    S.cart.fulfillment = o.fulfillment;
+    S.cart.deliveryFee = o.fulfillment === 'delivery' ? num(o.delivery_fee) : null;
     S.cart.addTo = { id: o.id, order_no: o.order_no, table: o.tbl ? o.tbl.code : null }; location.hash = '#/pos';
     if (S.view === 'pos') VIEWS.pos.render();
+  },
+  async editdelivery(id) {
+    const o = await getOrder(id);
+    const w = Modal.open({
+      title: t('Delivery Charges'), html: `
+      <label class="f">${t('Delivery amount (Rs.)')}<input id="ed-v" type="number" min="0" value="${num(o.delivery_fee)}"></label>
+      <button class="btn primary lg block" id="ed-go">${t('Save')}</button>`
+    });
+    $('#ed-go', w).onclick = ev => safe(async () => {
+      await rpc('set_delivery_fee', { p_order: +id, p_fee: num($('#ed-v', w).value) });
+      Modal.close(w); toast(t('Delivery charges updated')); refreshView(); orderModal(+id);
+    }, { busy: ev.currentTarget });
+  },
+  async editservicecharge(id) {
+    const o = await getOrder(id);
+    const w = Modal.open({
+      title: t('Service charge'), html: `
+      <label class="f">${t('Service charge amount (Rs.)')}<input id="sv-v" type="number" min="0" value="${num(o.service_charge)}"></label>
+      <button class="btn primary lg block" id="sv-go">${t('Save')}</button>`
+    });
+    $('#sv-go', w).onclick = ev => safe(async () => {
+      await rpc('set_service_charge', { p_order: +id, p_amount: num($('#sv-v', w).value) });
+      Modal.close(w); toast(t('Service charge updated')); refreshView(); orderModal(+id);
+    }, { busy: ev.currentTarget });
+  },
+  async editdiscount(id) {
+    const o = await getOrder(id); const max = cashierDiscMax();
+    const w = Modal.open({
+      title: t('Discount'), html: `
+      <p class="sm muted">${t('Subtotal')}: <b>${money(o.subtotal)}</b></p>
+      <label class="f">${t('Discount amount (Rs.)')}<input id="ds-v" type="number" min="0" max="${o.subtotal}" value="${num(o.discount)}"></label>
+      ${S.role === 'cashier' ? `<div class="sm muted">${t('Your limit')}: ${max}%</div>` : ''}
+      <button class="btn primary lg block" id="ds-go">${t('Save')}</button>`
+    });
+    $('#ds-go', w).onclick = ev => safe(async () => {
+      const v = num($('#ds-v', w).value);
+      if (S.role === 'cashier') { const pct = o.subtotal ? v / o.subtotal * 100 : 0; if (pct > max + 0.001) return toast(t('Discount exceeds your limit'), 'err'); }
+      await rpc('set_discount', { p_order: +id, p_discount: v });
+      Modal.close(w); toast(t('Discount updated')); refreshView(); orderModal(+id);
+    }, { busy: ev.currentTarget });
   },
   async removeitem(id, el) {
     const itemId = el.dataset.item;
@@ -1874,7 +1958,7 @@ async function orderModal(id) {
     ${pays.length ? `<div class="card"><b>${t('Payments')}</b>${pays.map(p => `<div class="tot-row sm"><span>${fmtDT(p.created_at)} · ${esc(p.method)}${p.reference ? ' · ' + esc(p.reference) : ''}</span><span>${money(p.amount)}</span></div>`).join('')}</div>` : ''}
     ${d ? `<div class="card">🏍️ <b>${esc(d.riders?.name || '')}</b> — ${esc(d.riders?.rider_code || '')} · ${t(DSTATUS[d.status])}</div>` : ''}
     ${o.cancel_reason ? `<div class="banner">${t('Reason')}: ${esc(o.cancel_reason)}</div>` : ''}
-    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) ? cb('additems', 'Add Items') : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && ['paid', 'partial'].includes(o.payment_status) ? cb('refund', 'Refund', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}${S.role === 'super_admin' ? cb('deleteorder', 'Delete permanently (testing)', 'danger') : ''}</div>`
+    <div class="acts row wrap">${isStaff() || S.role === 'waiter' ? orderActs(o).replace(/data-id/g, 'data-closes="1" data-id') : ''}${isStaff() && open && !['assigned', 'picked_up', 'on_the_way'].includes(o.status) ? cb('additems', 'Add Items') : ''}${isStaff() && o.payment_status !== 'paid' && o.fulfillment === 'delivery' ? cb('editdelivery', 'Delivery Charges') : ''}${isStaff() && o.payment_status !== 'paid' ? cb('editdiscount', 'Discount') : ''}${isStaff() && o.payment_status !== 'paid' ? cb('editservicecharge', 'Service charge') : ''}${isStaff() ? cb('print', o.fulfillment === 'dinein' && open ? 'Generate Bill' : 'Print Receipt') : ''}${canCancel ? cb('cancel', 'Cancel order', 'danger') : ''}${isMgr() && ['paid', 'partial'].includes(o.payment_status) ? cb('refund', 'Refund', 'danger') : ''}${isMgr() && d && ACTIVE_D.includes(d.status) ? `<button class="btn sm" data-act="reassign" data-closes="1" data-id="${d.id}" data-oid="${o.id}">${t('REASSIGN RIDER')}</button>` : ''}${S.role === 'super_admin' ? cb('deleteorder', 'Delete permanently (testing)', 'danger') : ''}</div>`
   });
 }
 
@@ -1938,19 +2022,26 @@ function payModal(o, { thenComplete = false } = {}) {
 
 /* ---------- receipt modal ---------- */
 function showReceipt(o, { newOrderBtn = false, batchOnly = null } = {}) {
+  const canStamp = !batchOnly && o.payment_status === 'paid';
+  let size = '58', stamp = false;
   const w = Modal.open({
     title: t('Receipt'), wide: true, html: `
     <div class="rc-sec-label">${t('Kitchen Ticket')}</div>
     ${KitchenTicket.body(o, batchOnly)}
-    ${!batchOnly ? `<div class="rc-sec-label">${t('Counter Receipt')}</div>${Receipt.body(o, S.settings)}` : ''}
+    ${!batchOnly ? `<div class="rc-sec-label">${t('Counter Receipt')}</div><div id="rc-receipt-body">${Receipt.body(o, S.settings, stamp)}</div>` : ''}
+    ${canStamp ? `<label class="row sm b mt" style="justify-content:center;gap:8px"><input type="checkbox" id="rc-stamp"> 🔴 ${t('Print with PAID stamp')}</label>` : ''}
     <div class="muted b sm mt">${t('Print size')}</div>
     <div class="chips"><button type="button" class="chip on" data-sz="58">58mm</button><button type="button" class="chip" data-sz="80">80mm</button><button type="button" class="chip" data-sz="a4">A4</button></div>
     <div class="row wrap"><button class="btn primary grow" id="rc-print">🖨 ${t('PRINT')}</button><button class="btn grow" id="rc-dl">⬇ ${t('DOWNLOAD')}</button>${newOrderBtn ? `<button class="btn dark grow" id="rc-new">➕ ${t('NEW ORDER')}</button>` : ''}</div>`
   });
-  let size = '58';
   w.addEventListener('click', e => { const c = e.target.closest('[data-sz]'); if (c) { size = c.dataset.sz; $$('[data-sz]', w).forEach(x => x.classList.toggle('on', x === c)); } });
-  $('#rc-print', w).onclick = () => autoPrintOrderTickets(o, S.settings, batchOnly, size);
-  $('#rc-dl', w).onclick = () => Receipt.download(o, S.settings);
+  const stampChk = $('#rc-stamp', w);
+  if (stampChk) stampChk.onchange = () => {
+    stamp = stampChk.checked;
+    const rb = $('#rc-receipt-body', w); if (rb) rb.innerHTML = Receipt.body(o, S.settings, stamp);
+  };
+  $('#rc-print', w).onclick = () => autoPrintOrderTickets(o, S.settings, batchOnly, size, stamp);
+  $('#rc-dl', w).onclick = () => Receipt.download(o, S.settings, stamp);
   if (newOrderBtn) $('#rc-new', w).onclick = () => { Modal.close(w); location.hash = '#/pos'; if (S.view === 'pos') VIEWS.pos.render(); };
 }
 
@@ -1969,7 +2060,7 @@ function isHappyHourActive() {
 }
 function newCart() {
   const hh = isHappyHourActive() ? (S.settings.happy_hour || {}) : null;
-  return { source: S.role === 'waiter' ? 'dinein' : 'walkin', fulfillment: S.role === 'waiter' ? 'dinein' : 'pickup', table_id: null, waiter_id: S.role === 'waiter' ? S.user.id : null, items: [], customer: {}, discount: hh ? { type: 'percent', value: num(hh.discount_pct), auto: true } : { type: 'amount', value: 0 }, couponCode: null, couponPreview: 0, deliveryFee: null, payNow: false, payAmt: 0, payMethod: null, addTo: null, ref: uuid() };
+  return { source: S.role === 'waiter' ? 'dinein' : 'walkin', fulfillment: S.role === 'waiter' ? 'dinein' : 'pickup', table_id: null, waiter_id: S.role === 'waiter' ? S.user.id : null, items: [], customer: {}, discount: hh ? { type: 'percent', value: num(hh.discount_pct), auto: true } : { type: 'amount', value: 0 }, couponCode: null, couponPreview: 0, deliveryFee: null, serviceCharge: null, payNow: false, payAmt: 0, payMethod: null, addTo: null, ref: uuid() };
 }
 
 const SRC_FUL = { walkin: 'pickup', dinein: 'dinein', takeaway: 'pickup', phone: 'pickup', online: 'delivery', qr: 'dinein' };
@@ -1981,7 +2072,8 @@ function cartCalc(c) {
   let delivery = 0; if (c.fulfillment === 'delivery') { delivery = num(chg.delivery_fee); if (num(chg.free_delivery_above) > 0 && sub >= num(chg.free_delivery_above)) delivery = 0; if (c.deliveryFee !== null && c.deliveryFee !== undefined) delivery = num(c.deliveryFee); }
   const net = sub - disc;
   const tax = Math.round(net * num(chg.tax_pct) / 100);
-  const svc = c.fulfillment === 'dinein' ? Math.round(net * num(chg.service_charge_pct) / 100) : 0;
+  const autoSvc = c.fulfillment === 'dinein' ? Math.round(net * num(chg.service_charge_pct) / 100) : 0;
+  const svc = autoSvc + num(c.serviceCharge);
   return { sub, disc, delivery, tax, svc, total: net + delivery + tax + svc };
 }
 const cashierDiscMax = () => S.role === 'cashier' ? num((S.settings.permissions || {}).cashier_max_discount_pct) : 100;
@@ -2073,13 +2165,13 @@ VIEWS.pos = {
         <button class="btn sm ghost" id="cb-disc">% ${t('Discount')}</button>
         <button class="btn sm ghost" id="cb-promo">🎟️ ${t('Promo Code')}</button>
         ${c.fulfillment === 'delivery' ? `<button class="btn sm ghost" id="cb-delivery">🚚 ${t('Delivery Charges')}</button>` : ''}
-        <button class="btn sm ghost" id="cb-note">📝 ${t('Note')}</button>
+        <button class="btn sm ghost" id="cb-note">📝 ${t('Service charge')}</button>
         <button class="btn sm ghost" id="cb-clear">${t('Clear')}</button>
         <button class="btn sm ghost only-mobile" data-close-cart>${t('Close')}</button>
       </div>
       <button class="btn primary lg block" id="cb-checkout" ${c.items.length ? '' : 'disabled'}>${t(c.addTo ? 'Add Items' : 'Checkout')} · ${money(calc.total)}</button>`;
     $('#cb-clear').onclick = async () => { if (!c.items.length || await confirmBox(t('Clear the current order?'))) { S.cart = c.addTo ? Object.assign(newCart(), { addTo: c.addTo }) : newCart(); this.paintCart(); } };
-    $('#cb-note').onclick = async () => { const v = await askText(t('Order note'), t('Note'), { value: c.notes || '', textarea: true }); if (v !== null) c.notes = v; };
+    $('#cb-note').onclick = () => this.serviceChargeModal(calc);
     $('#cb-disc').onclick = () => this.discountModal(calc);
     $('#cb-promo').onclick = () => this.promoModal(calc);
     const cbDel = $('#cb-delivery'); if (cbDel) cbDel.onclick = () => this.deliveryModal(calc);
@@ -2112,6 +2204,17 @@ VIEWS.pos = {
     $('#del-reset', w).onclick = () => { c.deliveryFee = null; Modal.close(w); this.paintCart(); };
     $('#del-go', w).onclick = () => { c.deliveryFee = num($('#del-v', w).value); Modal.close(w); this.paintCart(); };
   },
+  serviceChargeModal(calc) {
+    const c = S.cart;
+    const w = Modal.open({
+      title: t('Service charge'), html: `
+      <label class="f">${t('Service charge amount (Rs.)')}<input id="svc-v" type="number" min="0" value="${c.serviceCharge ?? ''}"></label>
+      <p class="sm muted">${t('This amount is added on top of the bill, just like delivery charges or discount.')}</p>
+      <div class="row"><button class="btn sm ghost" id="svc-reset" type="button">${t('Remove')}</button><button class="btn primary lg" id="svc-go">${t('Apply')}</button></div>`
+    });
+    $('#svc-reset', w).onclick = () => { c.serviceCharge = null; Modal.close(w); this.paintCart(); };
+    $('#svc-go', w).onclick = () => { c.serviceCharge = num($('#svc-v', w).value); Modal.close(w); this.paintCart(); };
+  },
   discountModal(calc) {
     const c = S.cart; const max = cashierDiscMax();
     const w = Modal.open({
@@ -2132,8 +2235,18 @@ VIEWS.pos = {
   async submitAddItems() {
     const c = S.cart;
     const items = c.items.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, qty: i.qty, addon_ids: i.addons.map(a => a.id), note: i.note }));
+    const calc = cartCalc(c);
     await safe(async () => {
       await rpc('add_items', { p_order: c.addTo.id, p_items: items });
+      if (c.fulfillment === 'delivery' && c.deliveryFee !== null && c.deliveryFee !== undefined) {
+        await rpc('set_delivery_fee', { p_order: c.addTo.id, p_fee: num(c.deliveryFee) });
+      }
+      if (calc.disc > 0) {
+        await rpc('add_discount', { p_order: c.addTo.id, p_amount: calc.disc });
+      }
+      if (num(c.serviceCharge) > 0) {
+        await rpc('add_service_charge', { p_order: c.addTo.id, p_amount: num(c.serviceCharge) });
+      }
       const o = await getOrder(c.addTo.id);
       toast(t('Items added to kitchen')); S.cart = newCart(); this.render(); refreshView();
       showReceipt(o, { batchOnly: o.kitchen_batch });
@@ -2188,6 +2301,9 @@ VIEWS.pos = {
         payment: payAmt > 0 ? { amount: payAmt, method } : null
       };
       const res = await rpc('create_order', { p: payload });
+      if (num(c.serviceCharge) > 0) {
+        await rpc('set_service_charge', { p_order: res.id, p_amount: calc.svc }).catch(() => {});
+      }
       Modal.close(w); toast(`${t('Order created')}: #${res.order_no}`);
       const o = await getOrder(res.id); S.cart = newCart(); this.render(); refreshView(); updateBadge();
       showReceipt(o, { newOrderBtn: true });
@@ -2215,9 +2331,9 @@ VIEWS.dashboard = {
     const by = f => orders.filter(f).length;
     const av = S.riders.filter(r => r.status === 'available').length, od = S.riders.filter(r => r.status === 'on_delivery').length;
     const pendDel = orders.filter(o => o.fulfillment === 'delivery' && ['ready'].includes(o.status)).length;
-    const cash = done.filter(o => o.payment_method === 'Cash').reduce((s, o) => s + num(o.total), 0);
-    const card = done.filter(o => o.payment_method === 'Card').reduce((s, o) => s + num(o.total), 0);
-    const stat = (v, l, hero) => `<div class="stat ${hero ? 'hero' : ''}"><div class="v">${v}</div><div class="l">${t(l)}</div></div>`;
+    const payMethodsList = (S.settings.payment_methods && S.settings.payment_methods.length) ? S.settings.payment_methods : ['Cash', 'Card', 'Online Payment'];
+    const methodTotals = payMethodsList.map(m => ({ name: m, amt: done.filter(o => o.payment_method === m).reduce((s, o) => s + num(o.total), 0) }));
+    const stat = (v, l, hero) => `<div class="stat ${hero ? 'hero' : ''}"><div class="v">${v}</div><div class="l">${esc(t(l))}</div></div>`;
     let lowStockBanner = '';
     try {
       const low = await q(sb.from('inventory_items').select('name, unit, current_stock, min_stock, is_active').order('name'));
@@ -2238,7 +2354,7 @@ VIEWS.dashboard = {
         ${stat(by(o => o.status === 'ready'), 'Ready Orders')}${stat(done.length, 'Completed Orders')}
       </div>
       <div class="section-h">${t('Delivery')}</div>
-      <div class="stats">${stat(av, 'Available Riders')}${stat(od, 'Riders On Delivery')}${stat(pendDel, 'Pending Deliveries')}${stat(money(cash), 'Cash Sales')}${stat(money(card), 'Card Sales')}</div>
+      <div class="stats">${stat(av, 'Available Riders')}${stat(od, 'Riders On Delivery')}${stat(pendDel, 'Pending Deliveries')}${methodTotals.map(x => stat(money(x.amt), `${x.name} Sales`)).join('')}</div>
       <div class="section-h">${t('Quick Actions')}</div>
       <div class="quick">
         ${[['pos', '➕', 'New Order'], ['online', '🌐', 'Online Orders'], ['manual', '✍️', 'Manual Orders'], ['tables', '🍽️', 'Tables'], ['kitchen', '👨‍🍳', 'Kitchen'], ['delivery', '🛵', 'Delivery'], ['riders', '🏍️', 'Riders'], ['payments', '💳', 'Payments'], ['reports', '📈', 'Reports']]
