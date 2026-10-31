@@ -1484,7 +1484,7 @@ const Receipt = {
       ${o.fulfillment === 'delivery' && o.address ? row('Address', esc(o.address)) : ''}
       ${sb ? row(sb.label, esc(sb.name || '') + (sb.id ? ` (${esc(sb.id)})` : '')) : ''}</table><hr>
       <table>${lines}</table><hr>
-      <table>${row('Subtotal', money(o.subtotal))}${num(o.discount) ? row('Discount', '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? row('Delivery', money(o.delivery_fee)) : ''}
+      <table>${row('Subtotal', money(o.subtotal))}${num(o.discount) ? row('Discount' + (num(o.subtotal) ? ' (' + (Math.round(num(o.discount) / num(o.subtotal) * 1000) / 10) + '%)' : ''), '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? row('Delivery', money(o.delivery_fee)) : ''}
       ${num(o.tax) ? row('Tax', money(o.tax)) : ''}${num(o.service_charge) ? row('Service charge', money(o.service_charge)) : ''}
       <tr class="t"><td>TOTAL</td><td class="r">${money(o.total)}</td></tr>
       ${row('Payment', esc(o.payment_method || '—'))}${row('Status', (o.payment_status || '').toUpperCase())}

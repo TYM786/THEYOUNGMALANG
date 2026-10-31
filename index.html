@@ -1447,7 +1447,7 @@ const Receipt = {
       ${o.fulfillment === 'delivery' && o.address ? row('Address', esc(o.address)) : ''}
       ${sb ? row(sb.label, esc(sb.name || '') + (sb.id ? ` (${esc(sb.id)})` : '')) : ''}</table><hr>
       <table>${lines}</table><hr>
-      <table>${row('Subtotal', money(o.subtotal))}${num(o.discount) ? row('Discount', '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? row('Delivery', money(o.delivery_fee)) : ''}
+      <table>${row('Subtotal', money(o.subtotal))}${num(o.discount) ? row('Discount' + (num(o.subtotal) ? ' (' + (Math.round(num(o.discount) / num(o.subtotal) * 1000) / 10) + '%)' : ''), '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? row('Delivery', money(o.delivery_fee)) : ''}
       ${num(o.tax) ? row('Tax', money(o.tax)) : ''}${num(o.service_charge) ? row('Service charge', money(o.service_charge)) : ''}
       <tr class="t"><td>TOTAL</td><td class="r">${money(o.total)}</td></tr>
       ${row('Payment', esc(o.payment_method || '—'))}${row('Status', (o.payment_status || '').toUpperCase())}
@@ -1954,7 +1954,7 @@ async function orderModal(id) {
     <div class="row wrap gap6">${srcTag(o.source)}${stPill(o.status)}<span class="pill">${t(FUL[o.fulfillment])}</span>${o.tbl ? `<span class="pill">${t('Table')} ${esc(o.tbl.code)}</span>` : ''}${payPill(o.payment_status)}<span class="muted sm">${fmtDT(o.created_at)}${o.creator ? ' · ' + esc(o.creator.full_name) : ''}</span></div>
     ${o.customer_name || o.phone || o.address ? `<div class="card"><div>👤 <b>${esc(o.customer_name || '—')}</b> ${o.phone ? `<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>` : ''}</div>${o.address ? `<div>📍 ${esc(o.address)}</div>` : ''}${o.notes ? `<div>📝 ${esc(o.notes)}</div>` : ''}${o.waiter ? `<div>🧑‍🍳 ${t('Served By')}: ${esc(o.waiter.full_name)}${o.waiter.staff_id ? ` (${esc(o.waiter.staff_id)})` : ''}</div>` : ''}</div>` : ''}
     <div class="tbl-wrap"><table class="tbl"><tbody>${rows}</tbody></table></div>
-    <div class="card">${tr('Subtotal', money(o.subtotal))}${num(o.discount) ? tr('Discount', '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? tr('Delivery', money(o.delivery_fee)) : ''}${num(o.tax) ? tr('Tax', money(o.tax)) : ''}${num(o.service_charge) ? tr('Service charge', money(o.service_charge)) : ''}${tr('Total', money(o.total), 'grand')}${tr('Paid', money(o.paid_amount))}${o.payment_status !== 'paid' ? tr('Remaining', money(num(o.total) - num(o.paid_amount))) : ''}</div>
+    <div class="card">${tr('Subtotal', money(o.subtotal))}${num(o.discount) ? tr('Discount' + (num(o.subtotal) ? ' (' + (Math.round(num(o.discount) / num(o.subtotal) * 1000) / 10) + '%)' : ''), '− ' + money(o.discount)) : ''}${num(o.delivery_fee) ? tr('Delivery', money(o.delivery_fee)) : ''}${num(o.tax) ? tr('Tax', money(o.tax)) : ''}${num(o.service_charge) ? tr('Service charge', money(o.service_charge)) : ''}${tr('Total', money(o.total), 'grand')}${tr('Paid', money(o.paid_amount))}${o.payment_status !== 'paid' ? tr('Remaining', money(num(o.total) - num(o.paid_amount))) : ''}</div>
     ${pays.length ? `<div class="card"><b>${t('Payments')}</b>${pays.map(p => `<div class="tot-row sm"><span>${fmtDT(p.created_at)} · ${esc(p.method)}${p.reference ? ' · ' + esc(p.reference) : ''}</span><span>${money(p.amount)}</span></div>`).join('')}</div>` : ''}
     ${d ? `<div class="card">🏍️ <b>${esc(d.riders?.name || '')}</b> — ${esc(d.riders?.rider_code || '')} · ${t(DSTATUS[d.status])}</div>` : ''}
     ${o.cancel_reason ? `<div class="banner">${t('Reason')}: ${esc(o.cancel_reason)}</div>` : ''}
@@ -2155,7 +2155,7 @@ VIEWS.pos = {
     $('#cart-f').innerHTML = `
       ${c.discount.auto && c.discount.value > 0 ? `<div class="banner sm">🎉 ${t('Happy Hour Active')} — ${c.discount.value}% ${t('discount applied')}</div>` : ''}
       ${c.couponCode ? `<div class="tot-row"><span>🎟️ ${esc(c.couponCode)}</span><span>${t('applied')}</span></div>` : ''}
-      ${calc.disc ? `<div class="tot-row"><span>${t('Discount')}</span><span>− ${money(calc.disc)}</span></div>` : ''}
+      ${calc.disc ? `<div class="tot-row"><span>${t('Discount')}${calc.sub ? ` (${Math.round(calc.disc / calc.sub * 1000) / 10}%)` : ''}</span><span>− ${money(calc.disc)}</span></div>` : ''}
       ${calc.delivery ? `<div class="tot-row"><span>${t('Delivery')}</span><span>${money(calc.delivery)}</span></div>` : ''}
       ${calc.tax ? `<div class="tot-row"><span>${t('Tax')}</span><span>${money(calc.tax)}</span></div>` : ''}
       ${calc.svc ? `<div class="tot-row"><span>${t('Service charge')}</span><span>${money(calc.svc)}</span></div>` : ''}
@@ -2301,9 +2301,10 @@ VIEWS.pos = {
         payment: payAmt > 0 ? { amount: payAmt, method } : null
       };
       const res = await rpc('create_order', { p: payload });
-      if (num(c.serviceCharge) > 0) {
-        await rpc('set_service_charge', { p_order: res.id, p_amount: calc.svc }).catch(() => {});
-      }
+      // make sure delivery charges, discount and service charge are all saved on the order (idempotent, absolute values)
+      if (c.fulfillment === 'delivery' && calc.delivery > 0) await rpc('set_delivery_fee', { p_order: res.id, p_fee: calc.delivery }).catch(() => {});
+      if (calc.disc > 0) await rpc('set_discount', { p_order: res.id, p_discount: calc.disc }).catch(() => {});
+      if (calc.svc > 0) await rpc('set_service_charge', { p_order: res.id, p_amount: calc.svc }).catch(() => {});
       Modal.close(w); toast(`${t('Order created')}: #${res.order_no}`);
       const o = await getOrder(res.id); S.cart = newCart(); this.render(); refreshView(); updateBadge();
       showReceipt(o, { newOrderBtn: true });

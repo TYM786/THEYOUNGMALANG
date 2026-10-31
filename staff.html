@@ -1547,21 +1547,15 @@ function printHTML(title, html) {
 
 /* ---------- Staff Service / ID Card — auto-built from the saved staff profile ---------- */
 const ID_CARD_CSS = `
-  .id-card{--ym-orange:#E8964B;--ym-orange-dk:#C97A34;--ym-black:#1a1a1a;--ym-cream:#F6F1E7;width:85.6mm;height:53.98mm;background:#fff;border-radius:3mm;display:flex;flex-direction:column;color:#111;font-family:Arial,sans-serif;position:relative;
-    box-shadow:0 1px 0 #fff, 0 2.4px 0 #f3e7d4, 0 3.8px 0 #ecd9bb, 0 5.2px 0 #e3c89d, 0 14px 22px -6px rgba(0,0,0,.5), 0 2px 4px rgba(0,0,0,.25)}
-  .id-card-tilt{transform:perspective(900px) rotateX(4deg) rotateY(-6deg)}
-  .id-card-inner{border-radius:3mm;overflow:hidden;display:flex;flex-direction:column;height:100%}
-  .id-head{background:linear-gradient(135deg,var(--ym-black) 0%,#2b2117 100%);color:#fff;display:flex;align-items:center;gap:6px;padding:3mm 11mm 2mm 3mm;border-bottom:1.5mm solid var(--ym-orange);position:relative}
-  .id-logo-badge{height:11mm;width:11mm;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(circle at 34% 26%, #ffffff 0%, var(--ym-cream) 45%, var(--ym-orange) 100%);
-    box-shadow:0 1.5px 0 rgba(255,255,255,.75) inset, 0 -2px 3px rgba(0,0,0,.4) inset, 0 3px 1px rgba(0,0,0,.15), 0 4px 7px rgba(0,0,0,.5), 0 0 0 1.4px var(--ym-orange-dk)}
-  .id-logo{height:9mm;width:9mm;border-radius:50%;object-fit:cover;box-shadow:0 1px 3px rgba(0,0,0,.35) inset, 0 0 0 1px rgba(255,255,255,.5)}
+  .id-card{--ym-orange:#E8964B;--ym-orange-dk:#C97A34;--ym-black:#1a1a1a;--ym-cream:#F6F1E7;width:85.6mm;height:53.98mm;background:#fff;border-radius:3mm;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.3);display:flex;flex-direction:column;color:#111;font-family:Arial,sans-serif;border:1px solid var(--ym-orange)}
+  .id-head{background:linear-gradient(135deg,var(--ym-black) 0%,#2b2117 100%);color:#fff;display:flex;align-items:center;gap:6px;padding:3mm 3mm 2mm;border-bottom:1.5mm solid var(--ym-orange)}
+  .id-logo{height:9mm;width:9mm;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--ym-orange)}
   .id-head-txt{flex:1;line-height:1.15;min-width:0}
-  .id-brand{font-size:9.5px;font-weight:900;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ym-orange);text-shadow:0 1px 1px rgba(0,0,0,.4)}
+  .id-brand{font-size:9.5px;font-weight:900;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ym-orange)}
   .id-sub{font-size:6.5px;opacity:.85}
-  .id-tag{font-size:6.5px;font-weight:800;background:linear-gradient(145deg,#ffcb8a,var(--ym-orange));color:var(--ym-black);padding:2px 5px;border-radius:3px;letter-spacing:.5px;flex-shrink:0;box-shadow:0 1px 0 rgba(255,255,255,.5) inset, 0 2px 3px rgba(0,0,0,.35)}
-  .id-body{flex:1;display:flex;gap:3mm;padding:2.5mm 3mm;background:#fff;position:relative}
-  .id-photo{width:19mm;height:23mm;border-radius:2mm;overflow:hidden;background:var(--ym-cream);flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--ym-orange);box-shadow:0 2px 4px rgba(0,0,0,.25)}
+  .id-tag{font-size:6.5px;font-weight:800;background:var(--ym-orange);color:var(--ym-black);padding:2px 5px;border-radius:3px;letter-spacing:.5px;flex-shrink:0}
+  .id-body{flex:1;display:flex;gap:3mm;padding:2.5mm 3mm;background:#fff}
+  .id-photo{width:19mm;height:23mm;border-radius:2mm;overflow:hidden;background:var(--ym-cream);flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--ym-orange)}
   .id-photo img{width:100%;height:100%;object-fit:cover}
   .id-photo-ph{font-size:20px;color:var(--ym-orange-dk)}
   .id-info{flex:1;min-width:0}
@@ -1569,46 +1563,33 @@ const ID_CARD_CSS = `
   .id-desig{font-size:7.5px;color:var(--ym-orange-dk);font-weight:700;margin-bottom:2.5mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .id-row{display:flex;justify-content:space-between;font-size:7px;padding:1px 0;border-bottom:.5px dotted #e8cdae}
   .id-row span{color:#888}.id-row b{font-weight:800;color:var(--ym-black)}
-  .id-foot{background:var(--ym-cream);font-size:6px;text-align:center;padding:1.3mm;color:#5a4a36;border-top:1px solid #ecdcc3}
-  .ym-3d-badge{position:absolute;right:-8.5mm;top:-5.5mm;width:14mm;height:14mm;transform:rotate(14deg);filter:drop-shadow(0 4px 5px rgba(0,0,0,.45));z-index:5}
-  .ym-3d-badge .layer{position:absolute;left:50%;border-radius:50%;transform:translateX(-50%)}
-  .ym-3d-badge .bun-top{width:13mm;height:7mm;top:0;background:linear-gradient(160deg,#f3b969,#d98a35);border-radius:7mm 7mm 2mm 2mm;box-shadow:0 1.6mm 0 rgba(0,0,0,.12)}
-  .ym-3d-badge .lettuce{width:14.5mm;height:2.6mm;top:6.2mm;background:#8bc34a;border-radius:2mm;box-shadow:0 1mm 0 rgba(0,0,0,.1)}
-  .ym-3d-badge .cheese{width:13.6mm;height:2.2mm;top:8.2mm;background:#f6c445;border-radius:1mm;transform:translateX(-50%) skewX(-10deg);box-shadow:0 .9mm 0 rgba(0,0,0,.12)}
-  .ym-3d-badge .patty{width:13mm;height:3mm;top:9.9mm;background:linear-gradient(160deg,#8a5a34,#6b4324);border-radius:2mm;box-shadow:0 1mm 0 rgba(0,0,0,.18)}
-  .ym-3d-badge .bun-bottom{width:13.4mm;height:4.4mm;top:12.6mm;background:linear-gradient(160deg,#eaa857,#c97a34);border-radius:2mm 2mm 5mm 5mm}
-  @media print{.id-card{box-shadow:0 0 0 1px var(--ym-orange)}.id-card-tilt{transform:none}}`;
-function staffCardHTML(st, tilt = false) {
+  .id-foot{background:var(--ym-cream);font-size:6px;text-align:center;padding:1.3mm;color:#5a4a36;border-top:1px solid #ecdcc3}`;
+function staffCardHTML(st) {
   const dept = deptName(st.department_id), desig = desigName(st.designation_id);
-  return `<div class="id-card${tilt ? ' id-card-tilt' : ''}">
-    <div class="ym-3d-badge" aria-hidden="true">
-      <div class="layer bun-top"></div><div class="layer lettuce"></div><div class="layer cheese"></div><div class="layer patty"></div><div class="layer bun-bottom"></div>
+  return `<div class="id-card">
+    <div class="id-head"><img src="${BR.logo}" class="id-logo" alt="">
+      <div class="id-head-txt"><div class="id-brand">${esc(BR.name)}</div><div class="id-sub">${esc(BR.tagline || '')}</div></div>
+      <div class="id-tag">STAFF ID</div>
     </div>
-    <div class="id-card-inner">
-      <div class="id-head"><div class="id-logo-badge"><img src="${BR.logo}" class="id-logo" alt=""></div>
-        <div class="id-head-txt"><div class="id-brand">${esc(BR.name)}</div><div class="id-sub">${esc(BR.tagline || '')}</div></div>
-        <div class="id-tag">STAFF ID</div>
+    <div class="id-body">
+      <div class="id-photo">${st.photo ? `<img src="${esc(st.photo)}" alt="">` : `<div class="id-photo-ph">👤</div>`}</div>
+      <div class="id-info">
+        <div class="id-name">${esc(st.name)}</div>
+        <div class="id-desig">${esc(desig || '—')}${dept ? ' · ' + esc(dept) : ''}</div>
+        <div class="id-row"><span>ID</span><b>${esc(st.staff_code)}</b></div>
+        <div class="id-row"><span>${t('Phone')}</span><b>${esc(st.phone || '—')}</b></div>
+        <div class="id-row"><span>CNIC</span><b>${esc(st.cnic || '—')}</b></div>
+        <div class="id-row"><span>${t('Joined')}</span><b>${fmtD(st.joining_date)}</b></div>
       </div>
-      <div class="id-body">
-        <div class="id-photo">${st.photo ? `<img src="${esc(st.photo)}" alt="">` : `<div class="id-photo-ph">👤</div>`}</div>
-        <div class="id-info">
-          <div class="id-name">${esc(st.name)}</div>
-          <div class="id-desig">${esc(desig || '—')}${dept ? ' · ' + esc(dept) : ''}</div>
-          <div class="id-row"><span>ID</span><b>${esc(st.staff_code)}</b></div>
-          <div class="id-row"><span>${t('Phone')}</span><b>${esc(st.phone || '—')}</b></div>
-          <div class="id-row"><span>CNIC</span><b>${esc(st.cnic || '—')}</b></div>
-          <div class="id-row"><span>${t('Joined')}</span><b>${fmtD(st.joining_date)}</b></div>
-        </div>
-      </div>
-      <div class="id-foot">${esc(BR.address)} · ${esc((BR.phones || []).join(' / '))}</div>
     </div>
+    <div class="id-foot">${esc(BR.address)} · ${esc((BR.phones || []).join(' / '))}</div>
   </div>`;
 }
 function staffCardDoc(st, autoPrint) {
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(st.staff_code)} — ${esc(st.name)}</title><style>
     *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact}body{margin:0;padding:10mm;background:#eee;display:flex;justify-content:center}
     ${ID_CARD_CSS}
-    @media print{body{padding:0;background:#fff}}
+    @media print{body{padding:0;background:#fff}.id-card{box-shadow:none}}
     @page{size:auto;margin:6mm}
   </style></head><body>${staffCardHTML(st)}${autoPrint ? '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' : ''}</body></html>`;
 }
@@ -1616,7 +1597,7 @@ function showStaffCard(st) {
   const w = Modal.open({ title: `${t('Service Card')} — ${esc(st.name)}`, html: `
     <style>${ID_CARD_CSS}</style>
     <p class="sm muted" style="text-align:center">${t('Auto-generated from the saved staff profile — update the profile and this card updates too.')}</p>
-    <div style="display:flex;justify-content:center;padding:14px 0 26px"><div style="zoom:1.6">${staffCardHTML(st, true)}</div></div>
+    <div style="display:flex;justify-content:center;padding:14px 0 26px"><div style="zoom:1.6">${staffCardHTML(st)}</div></div>
     <div class="row wrap"><button class="btn primary grow" id="sc-print">🖨 ${t('PRINT')}</button><button class="btn grow" id="sc-dl">⬇ ${t('DOWNLOAD')}</button></div>`
   });
   $('#sc-print', w).onclick = () => {
