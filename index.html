@@ -2098,7 +2098,10 @@ VIEWS.pos = {
     $$('#pos-cats .cat').forEach(b => b.onclick = () => { this.cat = +b.dataset.cat; this.paintCats(); this.paintProds(); });
   },
   paintProds() {
-    const list = S.products.filter(p => p.category_id === this.cat && (!this.q || pick(p).toLowerCase().includes(this.q.toLowerCase())));
+    const ql = (this.q || '').trim().toLowerCase();
+    const catNm = c => ((S.cats.find(x => x.id === c) || {}).name || '').toLowerCase();
+    // while searching, look through ALL categories (name, other-language name or category name); otherwise show the selected tab only
+    const list = ql ? S.products.filter(p => `${pick(p)} ${p.name || ''} ${p.name_ur || ''} ${catNm(p.category_id)}`.toLowerCase().includes(ql)) : S.products.filter(p => p.category_id === this.cat);
     $('#pos-prods').innerHTML = `<div class="prod-tools"><input id="pos-search" placeholder="${t('Search products')}" value="${esc(this.q)}"></div>
       <div class="prod-grid">${list.map(p => `<button type="button" class="pcard ${p.is_available ? '' : 'off'}" data-p="${p.id}">
         ${p.image_url ? `<img src="${esc(p.image_url)}" alt="">` : `<div class="ph">${catEmoji((S.cats.find(c => c.id === p.category_id) || {}).name)}</div>`}
@@ -2264,6 +2267,7 @@ VIEWS.pos = {
         <label class="f">${t('Phone Number')}${needCust ? ' *' : ''}<input id="co-phone" value="${esc(c.customer.phone || '')}" inputmode="tel"></label>
         ${c.fulfillment === 'delivery' ? `<label class="f full">${t('Address')} *<textarea id="co-addr">${esc(c.customer.address || '')}</textarea></label>` : ''}
       </div>
+      <div id="co-sugg" class="card" style="display:none;padding:4px;margin:4px 0"></div>
       <div class="row" id="co-lookup"><button class="btn sm ghost" id="co-find" type="button">${t('Search repeat customer')}</button></div>
       <div class="muted b sm">${t('Payment Method')}</div>
       <div class="chips" id="co-pm">${methods.map((m, i) => `<button type="button" class="chip ${i ? '' : 'on'}" data-m="${esc(m)}">${esc(m)}</button>`).join('')}</div>
@@ -2281,6 +2285,27 @@ VIEWS.pos = {
         if (mode === 'partial' && +$('#co-amt', w).value === calc.total) $('#co-amt', w).value = '';
       }
     });
+    // repeat customers: as soon as a phone/name is typed, show matching saved customers — tap one to fill name, phone and address
+    const fillCust = cu => {
+      $('#co-name', w).value = cu.name || ''; $('#co-phone', w).value = cu.phone || ''; if ($('#co-addr', w)) $('#co-addr', w).value = cu.address || '';
+      $('#co-sugg', w).style.display = 'none'; toast(`${t('Found')}: ${cu.name || cu.phone}`);
+    };
+    const suggest = debounce(async () => {
+      const box = $('#co-sugg', w); if (!box) return;
+      const term = ($('#co-phone', w).value.trim().length >= 3 ? $('#co-phone', w).value : $('#co-name', w).value).trim().replace(/[%,()]/g, '');
+      if (term.length < 3) { box.style.display = 'none'; return; }
+      try {
+        const rows = await q(sb.from('customers').select('*').or(`phone.ilike.%${term}%,name.ilike.%${term}%`).limit(5));
+        if (!rows.length) { box.style.display = 'none'; return; }
+        box.innerHTML = rows.map((cu, i) => `<button type="button" class="btn ghost block" style="text-align:start;margin:2px 0" data-ci="${i}">👤 <b>${esc(cu.name || '—')}</b> · ${esc(cu.phone || '')}${cu.address ? `<br><span class="sm muted">📍 ${esc(cu.address)}</span>` : ''}</button>`).join('');
+        box.style.display = 'block';
+        $$('[data-ci]', box).forEach(b => b.onclick = () => fillCust(rows[+b.dataset.ci]));
+        // exact phone match (full number typed) → fill everything automatically
+        const digits = term.replace(/\D/g, '');
+        if (digits.length >= 10) { const ex = rows.find(r => (r.phone || '').replace(/\D/g, '').endsWith(digits.slice(-10))); if (ex && !$('#co-name', w).value.trim()) fillCust(ex); }
+      } catch (e) { box.style.display = 'none'; }
+    }, 300);
+    $('#co-phone', w).addEventListener('input', suggest); $('#co-name', w).addEventListener('input', suggest);
     $('#co-find', w).onclick = async () => {
       const term = await askText(t('Search repeat customer'), t('Name, phone or order number'));
       if (!term) return;
