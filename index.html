@@ -2098,6 +2098,7 @@ VIEWS.pos = {
     $$('#pos-cats .cat').forEach(b => b.onclick = () => { this.cat = +b.dataset.cat; this.paintCats(); this.paintProds(); });
   },
   paintProds() {
+    const hadFocus = document.activeElement && document.activeElement.id === 'pos-search';
     const ql = (this.q || '').trim().toLowerCase();
     const catNm = c => ((S.cats.find(x => x.id === c) || {}).name || '').toLowerCase();
     // while searching, look through ALL categories (name, other-language name or category name); otherwise show the selected tab only
@@ -2107,6 +2108,8 @@ VIEWS.pos = {
         ${p.image_url ? `<img src="${esc(p.image_url)}" alt="">` : `<div class="ph">${catEmoji((S.cats.find(c => c.id === p.category_id) || {}).name)}</div>`}
         <div class="pi"><div class="pn">${esc(pick(p))}</div><div class="pp">${money(p.price) === money(0) ? t('From') + ' ' + money(Math.min(...S.variants.filter(v => v.product_id === p.id).map(v => v.price), Infinity)) : money(p.price)}</div>${!p.is_available ? `<span class="pill bad sm">${t('Unavailable')}</span>` : ''}</div></button>`).join('') || `<div class="empty">${t('No products')}</div>`}</div>`;
     $('#pos-search').oninput = debounce(e => { this.q = e.target.value; this.paintProds(); }, 200);
+    // keep the cursor in the search box after the list repaints, so the whole word can be typed in one go
+    if (hadFocus) { const si = $('#pos-search'); si.focus(); const L = si.value.length; try { si.setSelectionRange(L, L); } catch (e) {} }
     $$('#pos-prods .pcard:not(.off)').forEach(b => b.onclick = () => {
       const p = S.products.find(x => x.id === +b.dataset.p);
       openItemPicker({ product: p, variants: S.variants, addons: S.addons, onAdd: it => { S.cart.items.push(it); this.paintCart(); toast(`${t('Added')}: ${pick(p)}`); } });
