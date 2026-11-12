@@ -863,6 +863,16 @@ window.UR = {
  "Software-provider line text": "سافٹ ویئر فراہم کنندہ کی لائن کا متن",
  "Charges": "چارجز",
  "Delivery charges (Rs.)": "ڈیلیوری چارجز (روپے)",
+ "Delivery Areas": "ڈیلیوری ایریاز",
+ "Area name": "ایریا کا نام",
+ "Charges (Rs.)": "چارجز (روپے)",
+ "Add area": "ایریا شامل کریں",
+ "Add each area with its fixed delivery charges. While making a delivery order the area buttons appear and the charges are added automatically.": "ہر ایریا اس کے مقرر ڈیلیوری چارجز کے ساتھ شامل کریں۔ ڈیلیوری آرڈر بناتے وقت ایریا کے بٹن آئیں گے اور چارجز خود شامل ہو جائیں گے۔",
+ "Delivery area": "ڈیلیوری ایریا",
+ "Other / custom": "دیگر / اپنی مرضی",
+ "Custom dates": "اپنی تاریخیں",
+ "Load more": "مزید لوڈ کریں",
+ "To": "تک",
  "Free delivery above (Rs., 0 = never)": "مفت ڈیلیوری حد (روپے، 0 = کبھی نہیں)",
  "Tax %": "ٹیکس %",
  "Dine-in service charge %": "ڈائن اِن سروس چارج %",
@@ -1199,6 +1209,7 @@ async function safe(fn, { busy } = {}) {
   finally { if (busy) busy.disabled = false; }
 }
 async function q(promise) { const { data, error } = await promise; if (error) throw new Error(friendlyErr(error)); return data; }
+async function qAll(build, page = 1000) { const out = []; for (let from = 0; ; from += page) { const rows = await q(build().range(from, from + page - 1)); out.push(...rows); if (rows.length < page) break; } return out; }
 
 /* ---------- sounds ---------- */
 function beep() {
@@ -1587,6 +1598,11 @@ async function loadSettings() {
 async function saveSetting(key, value) {
   await q(sb.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }));
 }
+
+/* ---------- DELIVERY AREAS (fixed charges per area) ---------- */
+function areaRowHTML(a) { a = a || {}; return `<div class="row area-row" style="gap:8px;margin-bottom:6px;align-items:center"><input class="ar-name" placeholder="${t('Area name')}" value="${esc(a.name || '')}" style="flex:2"><input class="ar-fee" type="number" min="0" placeholder="${t('Charges (Rs.)')}" value="${a.charge ?? ''}" style="flex:1"><button type="button" class="btn sm ghost" onclick="this.parentNode.remove()">✕</button></div>`; }
+function ymAreaAdd() { const b = document.getElementById('s-areas'); if (b) { b.insertAdjacentHTML('beforeend', areaRowHTML()); const n = b.querySelectorAll('.ar-name'); n[n.length - 1].focus(); } }
+function readAreas() { return Array.from(document.querySelectorAll('#s-areas .area-row')).map(r => ({ name: r.querySelector('.ar-name').value.trim(), charge: Number(r.querySelector('.ar-fee').value) || 0 })).filter(a => a.name); }
 function settingsFormHTML(S, canPerm) {
   const r = S.restaurant || {}, c = S.charges || {}, p = S.permissions || {}, o = S.online || {}, k = S.kitchen || {}, rd = S.rider || {}, hh = S.happy_hour || {};
   const f = (id, label, val, type = 'text') => `<label class="f">${t(label)}<input id="${id}" type="${type}" value="${esc(val ?? '')}"></label>`;
@@ -1606,6 +1622,9 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-del', 'Delivery charges (Rs.)', c.delivery_fee ?? 0, 'number')}${f('s-free', 'Free delivery above (Rs., 0 = never)', c.free_delivery_above ?? 0, 'number')}
       ${f('s-tax', 'Tax %', c.tax_pct ?? 0, 'number')}${f('s-svc', 'Dine-in service charge %', c.service_charge_pct ?? 0, 'number')}
       ${f('s-min', 'Minimum online order (Rs.)', c.min_online_order ?? 0, 'number')}</div></div>
+    <div class="card"><h3>🛵 ${t('Delivery Areas')}</h3><p class="sm muted">${t('Add each area with its fixed delivery charges. While making a delivery order the area buttons appear and the charges are added automatically.')}</p>
+      <div id="s-areas">${(Array.isArray(S.delivery_areas) ? S.delivery_areas : []).map(areaRowHTML).join('')}</div>
+      <button class="btn sm ghost" type="button" onclick="ymAreaAdd()">➕ ${t('Add area')}</button></div>
     <div class="card"><h3>${t('Payment Methods')}</h3><label class="f">${t('One per line')}<textarea id="s-pm">${esc((S.payment_methods || ['Cash', 'Card', 'Online Payment']).join('\n'))}</textarea></label></div>
     ${canPerm ? `<div class="card"><h3>${t('Permissions')}</h3><div class="form-grid">
       ${f('s-disc', 'Max discount for Cashier (%)', p.cashier_max_discount_pct ?? 0, 'number')}
@@ -1625,6 +1644,7 @@ async function saveSettingsForm(S, canPerm) {
   const v = id => $(id).value;
   await saveSetting('restaurant', Object.assign({}, S.restaurant || {}, { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot'), show_logo: $('#s-showlogo').checked, show_name: $('#s-showname').checked, show_tagline: $('#s-showtag').checked, logo_size: Math.min(160, Math.max(20, num(v('#s-logosize')) || 64)), software_credit_enabled: $('#s-swcredit-on').checked, software_credit_text: v('#s-swcredit-text') }));
   await saveSetting('charges', { delivery_fee: num(v('#s-del')), free_delivery_above: num(v('#s-free')), tax_pct: num(v('#s-tax')), service_charge_pct: num(v('#s-svc')), min_online_order: num(v('#s-min')) });
+  if (document.getElementById('s-areas')) await saveSetting('delivery_areas', readAreas());
   await saveSetting('payment_methods', v('#s-pm').split('\n').map(x => x.trim()).filter(Boolean));
   if (canPerm) {
     await saveSetting('permissions', { cashier_max_discount_pct: num(v('#s-disc')), cashier_can_cancel: v('#s-canc') === '1' });
@@ -1849,9 +1869,11 @@ const ACT = {
     const o = await getOrder(id);
     const w = Modal.open({
       title: t('Delivery Charges'), html: `
+      ${deliveryAreas().length ? `<div class="chips" id="ed-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
       <label class="f">${t('Delivery amount (Rs.)')}<input id="ed-v" type="number" min="0" value="${num(o.delivery_fee)}"></label>
       <button class="btn primary lg block" id="ed-go">${t('Save')}</button>`
     });
+    $$('#ed-areas .chip', w).forEach(b => b.onclick = () => { $('#ed-v', w).value = num(deliveryAreas()[+b.dataset.i].charge); $$('#ed-areas .chip', w).forEach(x => x.classList.toggle('on', x === b)); });
     $('#ed-go', w).onclick = ev => safe(async () => {
       await rpc('set_delivery_fee', { p_order: +id, p_fee: num($('#ed-v', w).value) });
       Modal.close(w); toast(t('Delivery charges updated')); refreshView(); orderModal(+id);
@@ -2064,6 +2086,7 @@ function newCart() {
 }
 
 const SRC_FUL = { walkin: 'pickup', dinein: 'dinein', takeaway: 'pickup', phone: 'pickup', online: 'delivery', qr: 'dinein' };
+const deliveryAreas = () => (Array.isArray(S.settings && S.settings.delivery_areas) ? S.settings.delivery_areas : []).filter(a => a && a.name);
 function cartCalc(c) {
   const sub = c.items.reduce((s, i) => s + (i.base + i.addons.reduce((a, x) => a + x.price, 0)) * i.qty, 0);
   const manualDisc = c.discount.type === 'percent' ? Math.round(sub * num(c.discount.value) / 100) : num(c.discount.value);
@@ -2123,6 +2146,7 @@ VIEWS.pos = {
         ${addNote}
         ${!c.addTo ? `<div class="chips" id="cart-src">${srcOptions.map(s => `<button type="button" class="chip ${c.source === s ? 'on' : ''}" data-src="${s}">${t(SRC[s])}</button>`).join('')}</div>` : ''}
         ${!c.addTo && c.fulfillment !== 'dinein' ? `<div class="chips" id="cart-ful">${['pickup', 'delivery'].map(f => `<button type="button" class="chip ${c.fulfillment === f ? 'on' : ''}" data-ful="${f}">${t(FUL[f])}</button>`).join('')}</div>` : ''}
+        ${!c.addTo && c.fulfillment === 'delivery' ? this.areaChips(c) : ''}
         ${!c.addTo && c.fulfillment === 'dinein' ? this.tablePicker() : ''}
         ${!c.addTo && c.fulfillment === 'dinein' && S.role !== 'waiter' ? this.waiterPicker() : ''}</div>
       <div class="cart-lines" id="cart-lines"></div>
@@ -2130,7 +2154,12 @@ VIEWS.pos = {
     this.paintLines(); this.paintFooter(calc);
     if (!c.addTo) {
       $$('#cart-src .chip').forEach(b => b.onclick = () => { c.source = b.dataset.src; c.fulfillment = SRC_FUL[c.source]; if (c.source !== 'qr') c.table_id = c.table_id; this.paintCart(); });
-      const fulBox = $('#cart-ful'); if (fulBox) $$('#cart-ful .chip').forEach(b => b.onclick = () => { c.fulfillment = b.dataset.ful; this.paintCart(); });
+      $$('#cart-area .chip').forEach(b => b.onclick = () => {
+        const ar = deliveryAreas()[+b.dataset.area];
+        if (!ar || c.deliveryArea === ar.name) { c.deliveryArea = null; c.deliveryFee = null; } else { c.deliveryArea = ar.name; c.deliveryFee = num(ar.charge); }
+        this.paintCart();
+      });
+      const fulBox = $('#cart-ful'); if (fulBox) $$('#cart-ful .chip').forEach(b => b.onclick = () => { c.fulfillment = b.dataset.ful; if (c.fulfillment !== 'delivery') { c.deliveryArea = null; c.deliveryFee = null; } this.paintCart(); });
       const tp = $('#cart-table'); if (tp) tp.onchange = () => { c.table_id = +tp.value || null; };
       const wp = $('#cart-waiter'); if (wp) wp.onchange = () => { c.waiter_id = wp.value || null; };
     }
@@ -2199,16 +2228,22 @@ VIEWS.pos = {
     });
     const rm = $('#pc-rm', w); if (rm) rm.onclick = () => { c.couponCode = null; c.couponPreview = 0; Modal.close(w); this.paintCart(); };
   },
+  areaChips(c) {
+    const ar = deliveryAreas(); if (!ar.length) return '';
+    return `<div class="chips" id="cart-area" title="${t('Delivery area')}">${ar.map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-area="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>`;
+  },
   deliveryModal(calc) {
     const c = S.cart;
     const w = Modal.open({
       title: t('Delivery Charges'), html: `
+      ${deliveryAreas().length ? `<div class="chips" id="del-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
       <label class="f">${t('Delivery amount (Rs.)')}<input id="del-v" type="number" min="0" value="${c.deliveryFee ?? calc.delivery}"></label>
       <p class="sm muted">${t('Delivery charges vary by area/distance — enter the correct amount for this order.')}</p>
       <div class="row"><button class="btn sm ghost" id="del-reset" type="button">${t('Use default')}</button><button class="btn primary lg" id="del-go">${t('Apply')}</button></div>`
     });
-    $('#del-reset', w).onclick = () => { c.deliveryFee = null; Modal.close(w); this.paintCart(); };
-    $('#del-go', w).onclick = () => { c.deliveryFee = num($('#del-v', w).value); Modal.close(w); this.paintCart(); };
+    $$('#del-areas .chip', w).forEach(b => b.onclick = () => { const a = deliveryAreas()[+b.dataset.i]; c.deliveryArea = a.name; $('#del-v', w).value = num(a.charge); $$('#del-areas .chip', w).forEach(x => x.classList.toggle('on', x === b)); });
+    $('#del-reset', w).onclick = () => { c.deliveryFee = null; c.deliveryArea = null; Modal.close(w); this.paintCart(); };
+    $('#del-go', w).onclick = () => { c.deliveryFee = num($('#del-v', w).value); const a = deliveryAreas().find(x => x.name === c.deliveryArea); if (a && num(a.charge) !== c.deliveryFee) c.deliveryArea = null; Modal.close(w); this.paintCart(); };
   },
   serviceChargeModal(calc) {
     const c = S.cart;
@@ -2318,7 +2353,8 @@ VIEWS.pos = {
       toast(`${t('Found')}: ${cu.name || cu.phone}`);
     };
     $('#co-go', w).onclick = ev => safe(async () => {
-      const name = $('#co-name', w).value.trim(), phone = $('#co-phone', w).value.trim(), addr = $('#co-addr', w) ? $('#co-addr', w).value.trim() : '';
+      const name = $('#co-name', w).value.trim(), phone = $('#co-phone', w).value.trim(); let addr = $('#co-addr', w) ? $('#co-addr', w).value.trim() : '';
+      if (c.fulfillment === 'delivery' && c.deliveryArea && addr && !addr.toLowerCase().includes(c.deliveryArea.toLowerCase())) addr = addr + ', ' + c.deliveryArea;
       if (needCust && (!name || !phone || !addr)) throw new Error(t('Delivery needs customer name, phone and address'));
       const payAmt = mode === 'later' ? 0 : mode === 'full' ? calc.total : num($('#co-amt', w).value);
       const payload = {
@@ -2395,12 +2431,13 @@ VIEWS.dashboard = {
 /* ---------- ORDERS (all) ---------- */
 function orderListView(id, title, filterFn) {
   VIEWS[id] = {
-    f: { range: 'today', status: '', src: '', q: '' },
+    f: { range: 'today', status: '', src: '', q: '', from: '', to: '' }, rows: [], off: 0, done: false, tok: 0,
     async render() {
       $('#view').innerHTML = `<div class="view-head"><h2>${t(title)}</h2></div>
         <div class="olist-tools">
           <input id="ol-q" placeholder="${t('Order #, name, phone…')}" value="${esc(this.f.q)}">
-          <select id="ol-range"><option value="today">${t('Today')}</option><option value="yesterday">${t('Yesterday')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="90">${t('Last 90 days')}</option><option value="365">${t('Last 1 year')}</option><option value="1095">${t('Last 3 years')}</option><option value="all">${t('All')}</option></select>
+          <select id="ol-range"><option value="today">${t('Today')}</option><option value="yesterday">${t('Yesterday')}</option><option value="7">${t('Last 7 days')}</option><option value="30">${t('Last 30 days')}</option><option value="90">${t('Last 90 days')}</option><option value="365">${t('Last 1 year')}</option><option value="1095">${t('Last 3 years')}</option><option value="all">${t('All')}</option><option value="custom">${t('Custom dates')}</option></select>
+          <input id="ol-from" type="date" title="${t('From')}" value="${this.f.from}"><input id="ol-to" type="date" title="${t('To')}" value="${this.f.to}">
           <select id="ol-status"><option value="">${t('All statuses')}</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>
           ${id === 'orders' ? `<select id="ol-src"><option value="">${t('All sources')}</option>${Object.entries(SRC).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>` : ''}
         </div>
@@ -2408,23 +2445,40 @@ function orderListView(id, title, filterFn) {
       $('#ol-range').value = this.f.range; $('#ol-status').value = this.f.status; if ($('#ol-src')) $('#ol-src').value = this.f.src;
       $('#ol-q').oninput = debounce(e => { this.f.q = e.target.value; this.load(); }, 300);
       $('#ol-range').onchange = e => { this.f.range = e.target.value; this.load(); };
+      $('#ol-from').onchange = e => { this.f.from = e.target.value; this.f.range = 'custom'; $('#ol-range').value = 'custom'; this.load(); };
+      $('#ol-to').onchange = e => { this.f.to = e.target.value; this.f.range = 'custom'; $('#ol-range').value = 'custom'; this.load(); };
       $('#ol-status').onchange = e => { this.f.status = e.target.value; this.load(); };
       if ($('#ol-src')) $('#ol-src').onchange = e => { this.f.src = e.target.value; this.load(); };
       await this.load();
     },
     refresh() { this.load(); },
-    async load() {
-      let qry = sb.from('orders').select(OSEL).order('created_at', { ascending: false }).limit(200);
-      if (this.f.range === 'today') qry = qry.gte('created_at', startOfDay().toISOString());
-      else if (this.f.range === 'yesterday') qry = qry.gte('created_at', addDays(startOfDay(), -1).toISOString()).lt('created_at', startOfDay().toISOString());
-      else if (['7', '30', '90', '365', '1095'].includes(this.f.range)) qry = qry.gte('created_at', addDays(startOfDay(), -Number(this.f.range)).toISOString());
-      if (this.f.status) qry = qry.eq('status', this.f.status);
-      if (this.f.src) qry = qry.eq('source', this.f.src);
-      if (this.f.q) qry = qry.or(`order_no.ilike.%${this.f.q}%,customer_name.ilike.%${this.f.q}%,phone.ilike.%${this.f.q}%`);
-      let rows = await q(qry);
-      if (filterFn) rows = rows.filter(filterFn);
+    async load(more) {
+      const PAGE = 100, tok = ++this.tok;
+      if (!more) { this.rows = []; this.off = 0; this.done = false; }
       const grid = $('#ol-grid'); if (!grid) return;
-      grid.innerHTML = rows.length ? rows.map(o => orderCard(o, { delivery: o.fulfillment === 'delivery' })).join('') : `<div class="empty">${t('No orders found')}</div>`;
+      if (!more) grid.innerHTML = `<div class="empty">${t('Loading')}…</div>`;
+      let got = 0;
+      while (got < PAGE && !this.done) {
+        let qry = sb.from('orders').select(OSEL).order('created_at', { ascending: false }).order('id', { ascending: false }).range(this.off, this.off + PAGE - 1);
+        if (this.f.range === 'today') qry = qry.gte('created_at', startOfDay().toISOString());
+        else if (this.f.range === 'yesterday') qry = qry.gte('created_at', addDays(startOfDay(), -1).toISOString()).lt('created_at', startOfDay().toISOString());
+        else if (['7', '30', '90', '365', '1095'].includes(this.f.range)) qry = qry.gte('created_at', addDays(startOfDay(), -Number(this.f.range)).toISOString());
+        else if (this.f.range === 'custom') {
+          if (this.f.from) qry = qry.gte('created_at', new Date(this.f.from + 'T00:00:00').toISOString());
+          if (this.f.to) qry = qry.lt('created_at', addDays(new Date(this.f.to + 'T00:00:00'), 1).toISOString());
+        }
+        if (this.f.status) qry = qry.eq('status', this.f.status);
+        if (this.f.src) qry = qry.eq('source', this.f.src);
+        if (this.f.q) qry = qry.or(`order_no.ilike.%${this.f.q}%,customer_name.ilike.%${this.f.q}%,phone.ilike.%${this.f.q}%`);
+        const rows = await q(qry);
+        if (tok !== this.tok) return;
+        this.off += PAGE; if (rows.length < PAGE) this.done = true;
+        const fr = filterFn ? rows.filter(filterFn) : rows;
+        this.rows.push(...fr); got += fr.length;
+      }
+      const g2 = $('#ol-grid'); if (!g2) return;
+      g2.innerHTML = this.rows.length ? this.rows.map(o => orderCard(o, { delivery: o.fulfillment === 'delivery' })).join('') + (this.done ? '' : `<div class="full" style="grid-column:1/-1;text-align:center"><button class="btn lg" id="ol-more">⬇ ${t('Load more')}</button></div>`) : `<div class="empty">${t('No orders found')}</div>`;
+      const mb = $('#ol-more'); if (mb) mb.onclick = ev => { ev.currentTarget.disabled = true; this.load(true); };
     }
   };
 }
@@ -2786,7 +2840,7 @@ VIEWS.reports = {
   async load() {
     const body = $('#rp-body'); body.innerHTML = `<div class="empty">${t('Loading')}…</div>`;
     const since = this.since().toISOString();
-    const orders = await q(sb.from('orders').select('*').gte('created_at', since));
+    const orders = await qAll(() => sb.from('orders').select('*').gte('created_at', since).order('created_at').order('id'));
     const done = orders.filter(o => ['completed', 'delivered'].includes(o.status));
     const cancelled = orders.filter(o => ['cancelled', 'rejected'].includes(o.status));
     const head = `<div class="row end mb"><button class="btn sm ghost" id="rp-import-sales">📥 ${t('Import Old Sales Totals')}</button><input type="file" id="rp-import-sales-file" accept=".csv,.xlsx,.xls" class="hidden"><button class="btn sm ghost" id="rp-import">⬆ ${t('View old backup file')}</button><input type="file" id="rp-import-file" accept=".csv,.xlsx,.xls" class="hidden"><button class="btn sm ghost" id="rp-print">🖨 ${t('Print')}</button><button class="btn sm ghost" id="rp-csv">⬇ ${t('Export')}</button></div>`;
@@ -2828,7 +2882,7 @@ VIEWS.reports = {
       cols = [{ label: 'Rider', key: 'rider' }, { label: 'Order', key: 'order' }, { label: 'Status', key: 'status' }, { label: 'Date', key: 'date' }, { label: 'Amount', key: 'amount' }];
       title = 'Rider Delivery Report';
     } else if (this.tab === 'waiter') {
-      const wOrders = await q(sb.from('orders').select('*, waiter:profiles!waiter_id(full_name, staff_id), tbl:dining_tables(code)').eq('fulfillment', 'dinein').not('waiter_id', 'is', null).gte('created_at', since));
+      const wOrders = await qAll(() => sb.from('orders').select('*, waiter:profiles!waiter_id(full_name, staff_id), tbl:dining_tables(code)').eq('fulfillment', 'dinein').not('waiter_id', 'is', null).gte('created_at', since).order('created_at').order('id'));
       rows = wOrders.map(o => ({ waiter: `${o.waiter?.full_name || ''} (${o.waiter?.staff_id || ''})`, order: o.order_no, table: o.tbl?.code || '', status: t(STATUS[o.status]), date: fmtDT(o.created_at), total: money(o.total) }));
       cols = [{ label: 'Waiter', key: 'waiter' }, { label: 'Order', key: 'order' }, { label: 'Table', key: 'table' }, { label: 'Status', key: 'status' }, { label: 'Date', key: 'date' }, { label: 'Total', key: 'total' }];
       title = 'Waiter Report';

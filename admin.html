@@ -1051,6 +1051,20 @@ window.UR = {
  "Fill all fields": "تمام خانے پُر کریں",
  "Users & Roles": "صارفین اور کردار",
  "New staff create their own login from the POS login screen (\"New staff — create account\"). Activate them and set their role here.": "نیا اسٹاف POS لاگ اِن اسکرین سے خود اکاؤنٹ بنائے۔ یہاں انہیں فعال کریں اور کردار مقرر کریں۔",
+ "Delivery Areas": "ڈیلیوری ایریاز",
+ "Area name": "ایریا کا نام",
+ "Charges (Rs.)": "چارجز (روپے)",
+ "Add area": "ایریا شامل کریں",
+ "Add each area with its fixed delivery charges. While making a delivery order the area buttons appear and the charges are added automatically.": "ہر ایریا اس کے مقرر ڈیلیوری چارجز کے ساتھ شامل کریں۔ ڈیلیوری آرڈر بناتے وقت ایریا کے بٹن آئیں گے اور چارجز خود شامل ہو جائیں گے۔",
+ "Delivery area": "ڈیلیوری ایریا",
+ "Other / custom": "دیگر / اپنی مرضی",
+ "File format": "فائل فارمیٹ",
+ "Max rows per file": "ہر فائل میں زیادہ سے زیادہ قطاریں",
+ "Start backup": "بیک اپ شروع کریں",
+ "parts": "حصے",
+ "files": "فائلیں",
+ "lighter, one file per table part": "ہلکی، ہر ٹیبل حصے کی الگ فائل",
+ "Large data is split into several smaller files automatically, so the download never fails. Allow \"multiple downloads\" if the browser asks.": "بڑا ڈیٹا خود بخود کئی چھوٹی فائلوں میں تقسیم ہو جاتا ہے تاکہ ڈاؤن لوڈ ناکام نہ ہو۔ اگر براؤزر پوچھے تو \"متعدد ڈاؤن لوڈ\" کی اجازت دیں۔",
  "Business Settings": "کاروباری ترتیبات",
  "Record cash submitted": "جمع شدہ نقدی درج کریں",
  "Allow pop-ups to print": "پرنٹ کے لیے پاپ اپ کی اجازت دیں",
@@ -1251,6 +1265,7 @@ async function safe(fn, { busy } = {}) {
   finally { if (busy) busy.disabled = false; }
 }
 async function q(promise) { const { data, error } = await promise; if (error) throw new Error(friendlyErr(error)); return data; }
+async function qAll(build, page = 1000) { const out = []; for (let from = 0; ; from += page) { const rows = await q(build().range(from, from + page - 1)); out.push(...rows); if (rows.length < page) break; } return out; }
 
 /* ---------- sounds ---------- */
 function beep() {
@@ -1674,16 +1689,18 @@ const BACKUP_TABLES = [
 ];
 // large/binary columns left out of the backup so the file stays a reasonable size
 const BACKUP_SELECT = { staff_documents: 'id,staff_id,doc_type,title,file_name,created_at', staff: '*' };
-async function fetchAllRows(table) {
-  const out = []; let from = 0; const page = 1000; const cols = BACKUP_SELECT[table] || '*';
+async function fetchTablePages(table, onPage) {
+  // streams the table page by page (1000 rows) so nothing huge is held in memory
+  const cols = BACKUP_SELECT[table] || '*'; let from = 0, useOrder = true;
   for (;;) {
-    const { data, error } = await sb.from(table).select(cols).range(from, from + page - 1);
+    let qy = sb.from(table).select(cols); if (useOrder) qy = qy.order('id');
+    let { data, error } = await qy.range(from, from + 999);
+    if (error && useOrder) { useOrder = false; continue; }   // table has no id column
     if (error) throw error;
-    out.push(...data);
-    if (data.length < page) break;
-    from += page;
+    if (data.length) await onPage(data);
+    if (data.length < 1000) break;
+    from += 1000;
   }
-  return out;
 }
 function rowsToSheet(rows) {
   // flatten so date/time columns read cleanly in Excel and no [object Object] cells
@@ -1697,40 +1714,68 @@ function rowsToSheet(rows) {
   });
   return XLSX.utils.json_to_sheet(clean);
 }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function saveBlob(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
 async function downloadFullBackup() {
   const today = isoDate(new Date());
-  const w = Modal.open({ title: t('Download Full Backup'), html: `<div id="bk-log" class="sm muted" style="max-height:260px;overflow:auto"></div><div class="mt"><b id="bk-status">${t('Starting')}…</b></div>` });
+  const w = Modal.open({ title: t('Download Full Backup'), html: `
+    <div id="bk-opts">
+      <p class="sm muted">${t('Large data is split into several smaller files automatically, so the download never fails. Allow "multiple downloads" if the browser asks.')}</p>
+      <div class="form-grid">
+        <label class="f">${t('File format')}<select id="bk-fmt"><option value="xlsx">Excel (.xlsx)</option><option value="csv">CSV (${t('lighter, one file per table part')})</option></select></label>
+        <label class="f">${t('Max rows per file')}<input id="bk-rows" type="number" min="1000" step="1000" value="${'20000'}"></label>
+      </div>
+      <button class="btn primary lg block" id="bk-go">📥 ${t('Start backup')}</button></div>
+    <div id="bk-log" class="sm muted" style="max-height:260px;overflow:auto"></div><div class="mt"><b id="bk-status"></b></div>` });
   const log = $('#bk-log', w), status = $('#bk-status', w);
   const line = s => { log.innerHTML += `<div>${esc(s)}</div>`; log.scrollTop = log.scrollHeight; };
-  try {
-    const wb = XLSX.utils.book_new();
-    let ok = 0, skipped = 0;
-    for (let i = 0; i < BACKUP_TABLES.length; i++) {
-      const [table, sheetLabel] = BACKUP_TABLES[i];
-      status.textContent = `${t('Fetching')} ${sheetLabel}… (${i + 1}/${BACKUP_TABLES.length})`;
-      try {
-        const rows = await fetchAllRows(table);
-        XLSX.utils.book_append_sheet(wb, rowsToSheet(rows), sheetLabel.slice(0, 31));
-        line(`✅ ${sheetLabel}: ${rows.length} ${t('rows')}`);
-        ok++;
-      } catch (e) {
-        line(`⏭️ ${sheetLabel}: ${t('skipped')} (${t('not set up in this database')})`);
-        skipped++;
+  $('#bk-go', w).onclick = async () => {
+    const fmt = $('#bk-fmt', w).value, budget = Math.max(1000, Math.floor(num($('#bk-rows', w).value) || 20000));
+    $('#bk-opts', w).style.display = 'none'; status.textContent = t('Starting') + '…';
+    let wb = XLSX.utils.book_new(), inWb = 0, part = 0, ok = 0, skipped = 0; const files = [], index = [];
+    const flush = async () => {
+      if (!inWb && part) return;
+      part++; const name = `TheYoungMalang_Backup_${today}_part${String(part).padStart(2, '0')}.xlsx`;
+      status.textContent = `${t('Saving file')} ${part}…`;
+      XLSX.writeFile(wb, name); files.push(name); line(`💾 ${name}`);
+      wb = XLSX.utils.book_new(); inWb = 0; await sleep(900);
+    };
+    const addSheet = async (label, rows, seg) => {
+      const nm = (seg > 1 ? `${label} ${seg}` : label).slice(0, 31);
+      if (fmt === 'csv') {
+        part++; const name = `TheYoungMalang_${label.replace(/[^A-Za-z0-9]+/g, '_')}${seg > 1 ? '_p' + seg : ''}_${today}.csv`;
+        saveBlob(new Blob(['\ufeff', XLSX.utils.sheet_to_csv(rowsToSheet(rows))], { type: 'text/csv;charset=utf-8' }), name); files.push(name); line(`💾 ${name}`); await sleep(700);
+      } else {
+        if (inWb && inWb + rows.length > budget) await flush();
+        XLSX.utils.book_append_sheet(wb, rowsToSheet(rows), nm); inWb += rows.length;
       }
+    };
+    try {
+      for (let i = 0; i < BACKUP_TABLES.length; i++) {
+        const [table, sheetLabel] = BACKUP_TABLES[i];
+        status.textContent = `${t('Fetching')} ${sheetLabel}… (${i + 1}/${BACKUP_TABLES.length})`;
+        try {
+          let buf = [], seg = 0, total = 0;
+          await fetchTablePages(table, async data => {
+            buf.push(...data); total += data.length;
+            status.textContent = `${t('Fetching')} ${sheetLabel}… ${total}`;
+            while (buf.length >= budget) { seg++; await addSheet(sheetLabel, buf.splice(0, budget), seg); }
+          });
+          if (buf.length || !seg) { seg++; await addSheet(sheetLabel, buf, seg); }
+          line(`✅ ${sheetLabel}: ${total} ${t('rows')}${seg > 1 ? ` (${seg} ${t('parts')})` : ''}`); index.push([sheetLabel, total, seg]); ok++;
+        } catch (e) {
+          line(`⏭️ ${sheetLabel}: ${t('skipped')} (${t('not set up in this database')})`); skipped++;
+        }
+      }
+      const info = XLSX.utils.aoa_to_sheet([[t('THE YOUNG MALANG — Full Backup')], [t('Generated on'), new Date().toLocaleString('en-GB')], [t('Tables included'), ok], [t('Tables skipped (not set up)'), skipped], [], ['Table', 'Rows', 'Parts'], ...index]);
+      if (fmt === 'csv') { saveBlob(new Blob(['\ufeff', XLSX.utils.sheet_to_csv(info)], { type: 'text/csv;charset=utf-8' }), `TheYoungMalang_Backup_Info_${today}.csv`); }
+      else { XLSX.utils.book_append_sheet(wb, info, 'Backup Info'); inWb += 1; await flush(); }
+      status.innerHTML = `✅ ${t('Backup downloaded')}: <b>${files.length + (fmt === 'csv' ? 1 : 0)}</b> ${t('files')}`;
+      toast(t('Backup downloaded'));
+    } catch (e) {
+      status.textContent = t('Backup failed') + ': ' + (e.message || e); toast(t('Backup failed'), 'err');
     }
-    const summarySheet = XLSX.utils.aoa_to_sheet([
-      [t('THE YOUNG MALANG — Full Backup')], [t('Generated on'), new Date().toLocaleString('en-GB')],
-      [t('Tables included'), ok], [t('Tables skipped (not set up)'), skipped]
-    ]);
-    XLSX.utils.book_append_sheet(wb, summarySheet, 'Backup Info');
-    status.textContent = t('Saving file') + '…';
-    XLSX.writeFile(wb, `TheYoungMalang_FullBackup_${today}.xlsx`);
-    status.innerHTML = `✅ ${t('Backup downloaded')}: <b>TheYoungMalang_FullBackup_${today}.xlsx</b>`;
-    toast(t('Backup downloaded'));
-  } catch (e) {
-    status.textContent = t('Backup failed') + ': ' + (e.message || e);
-    toast(t('Backup failed'), 'err');
-  }
+  };
 }
 
 /* ---------- settings form (used by POS Settings and Admin Settings) ---------- */
@@ -1741,6 +1786,11 @@ async function loadSettings() {
 async function saveSetting(key, value) {
   await q(sb.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }));
 }
+
+/* ---------- DELIVERY AREAS (fixed charges per area) ---------- */
+function areaRowHTML(a) { a = a || {}; return `<div class="row area-row" style="gap:8px;margin-bottom:6px;align-items:center"><input class="ar-name" placeholder="${t('Area name')}" value="${esc(a.name || '')}" style="flex:2"><input class="ar-fee" type="number" min="0" placeholder="${t('Charges (Rs.)')}" value="${a.charge ?? ''}" style="flex:1"><button type="button" class="btn sm ghost" onclick="this.parentNode.remove()">✕</button></div>`; }
+function ymAreaAdd() { const b = document.getElementById('s-areas'); if (b) { b.insertAdjacentHTML('beforeend', areaRowHTML()); const n = b.querySelectorAll('.ar-name'); n[n.length - 1].focus(); } }
+function readAreas() { return Array.from(document.querySelectorAll('#s-areas .area-row')).map(r => ({ name: r.querySelector('.ar-name').value.trim(), charge: Number(r.querySelector('.ar-fee').value) || 0 })).filter(a => a.name); }
 function settingsFormHTML(S, canPerm) {
   const r = S.restaurant || {}, c = S.charges || {}, p = S.permissions || {}, o = S.online || {}, k = S.kitchen || {}, rd = S.rider || {}, hh = S.happy_hour || {};
   const f = (id, label, val, type = 'text') => `<label class="f">${t(label)}<input id="${id}" type="${type}" value="${esc(val ?? '')}"></label>`;
@@ -1760,6 +1810,9 @@ function settingsFormHTML(S, canPerm) {
       ${f('s-del', 'Delivery charges (Rs.)', c.delivery_fee ?? 0, 'number')}${f('s-free', 'Free delivery above (Rs., 0 = never)', c.free_delivery_above ?? 0, 'number')}
       ${f('s-tax', 'Tax %', c.tax_pct ?? 0, 'number')}${f('s-svc', 'Dine-in service charge %', c.service_charge_pct ?? 0, 'number')}
       ${f('s-min', 'Minimum online order (Rs.)', c.min_online_order ?? 0, 'number')}</div></div>
+    <div class="card"><h3>🛵 ${t('Delivery Areas')}</h3><p class="sm muted">${t('Add each area with its fixed delivery charges. While making a delivery order the area buttons appear and the charges are added automatically.')}</p>
+      <div id="s-areas">${(Array.isArray(S.delivery_areas) ? S.delivery_areas : []).map(areaRowHTML).join('')}</div>
+      <button class="btn sm ghost" type="button" onclick="ymAreaAdd()">➕ ${t('Add area')}</button></div>
     <div class="card"><h3>${t('Payment Methods')}</h3><label class="f">${t('One per line')}<textarea id="s-pm">${esc((S.payment_methods || ['Cash', 'Card', 'Online Payment']).join('\n'))}</textarea></label></div>
     ${canPerm ? `<div class="card"><h3>${t('Permissions')}</h3><div class="form-grid">
       ${f('s-disc', 'Max discount for Cashier (%)', p.cashier_max_discount_pct ?? 0, 'number')}
@@ -1779,6 +1832,7 @@ async function saveSettingsForm(S, canPerm) {
   const v = id => $(id).value;
   await saveSetting('restaurant', Object.assign({}, S.restaurant || {}, { name: v('#s-name'), tagline: v('#s-tag'), phones: v('#s-ph').split(',').map(x => x.trim()).filter(Boolean), address: v('#s-addr'), ntn: v('#s-ntn'), receipt_footer: v('#s-foot'), show_logo: $('#s-showlogo').checked, show_name: $('#s-showname').checked, show_tagline: $('#s-showtag').checked, logo_size: Math.min(160, Math.max(20, num(v('#s-logosize')) || 64)), software_credit_enabled: $('#s-swcredit-on').checked, software_credit_text: v('#s-swcredit-text') }));
   await saveSetting('charges', { delivery_fee: num(v('#s-del')), free_delivery_above: num(v('#s-free')), tax_pct: num(v('#s-tax')), service_charge_pct: num(v('#s-svc')), min_online_order: num(v('#s-min')) });
+  if (document.getElementById('s-areas')) await saveSetting('delivery_areas', readAreas());
   await saveSetting('payment_methods', v('#s-pm').split('\n').map(x => x.trim()).filter(Boolean));
   if (canPerm) {
     await saveSetting('permissions', { cashier_max_discount_pct: num(v('#s-disc')), cashier_can_cancel: v('#s-canc') === '1' });
@@ -2201,7 +2255,7 @@ VIEWS.reports = {
   async load() {
     const tbl = $('#rp-tbl'); tbl.innerHTML = `<tr><td>${t('Loading')}…</td></tr>`;
     const toExclusive = isoDate(addDays(new Date(this.to), 1));
-    const orders = await q(sb.from('orders').select('status,total,subtotal,discount,delivery_fee,tax,service_charge,created_at').gte('created_at', this.from).lt('created_at', toExclusive));
+    const orders = await qAll(() => sb.from('orders').select('status,total,subtotal,discount,delivery_fee,tax,service_charge,created_at').gte('created_at', this.from).lt('created_at', toExclusive).order('created_at').order('id'));
     let historical = []; try { historical = await q(sb.from('historical_sales').select('*').gte('sale_date', this.from).lte('sale_date', this.to)); } catch (e) {}
     const blank = () => ({ orders: 0, completed: 0, cancelled: 0, subtotal: 0, discount: 0, delivery: 0, tax: 0, service: 0, total: 0, imported: 0 });
     const groups = {};
