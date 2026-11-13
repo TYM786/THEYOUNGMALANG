@@ -863,6 +863,8 @@ window.UR = {
  "Software-provider line text": "سافٹ ویئر فراہم کنندہ کی لائن کا متن",
  "Charges": "چارجز",
  "Delivery charges (Rs.)": "ڈیلیوری چارجز (روپے)",
+ "Search area": "ایریا تلاش کریں",
+ "orders": "آرڈرز",
  "Delivery Areas": "ڈیلیوری ایریاز",
  "Area name": "ایریا کا نام",
  "Charges (Rs.)": "چارجز (روپے)",
@@ -1869,10 +1871,11 @@ const ACT = {
     const o = await getOrder(id);
     const w = Modal.open({
       title: t('Delivery Charges'), html: `
-      ${deliveryAreas().length ? `<div class="chips" id="ed-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
+      ${areaSearchHTML('ed-area-q')}${deliveryAreas().length ? `<div class="chips" id="ed-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
       <label class="f">${t('Delivery amount (Rs.)')}<input id="ed-v" type="number" min="0" value="${num(o.delivery_fee)}"></label>
       <button class="btn primary lg block" id="ed-go">${t('Save')}</button>`
     });
+    wireAreaSearch($('#ed-area-q', w), '#ed-areas .chip', w);
     $$('#ed-areas .chip', w).forEach(b => b.onclick = () => { $('#ed-v', w).value = num(deliveryAreas()[+b.dataset.i].charge); $$('#ed-areas .chip', w).forEach(x => x.classList.toggle('on', x === b)); });
     $('#ed-go', w).onclick = ev => safe(async () => {
       await rpc('set_delivery_fee', { p_order: +id, p_fee: num($('#ed-v', w).value) });
@@ -2086,6 +2089,14 @@ function newCart() {
 }
 
 const SRC_FUL = { walkin: 'pickup', dinein: 'dinein', takeaway: 'pickup', phone: 'pickup', online: 'delivery', qr: 'dinein' };
+function areaSearchHTML(id) { return deliveryAreas().length > 0 ? `<input id="${id}" class="area-q" placeholder="🔍 ${t('Search area')}" autocomplete="off" style="width:100%;margin-bottom:6px">` : ''; }
+function wireAreaSearch(inp, chipSel, root) {
+  if (!inp) return;
+  const chips = () => $$(chipSel, root);
+  const apply = () => { const v = inp.value.trim().toLowerCase(); chips().forEach(b => { b.style.display = !v || b.textContent.toLowerCase().includes(v) ? '' : 'none'; }); };
+  inp.oninput = apply;
+  inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); const f = chips().find(b => b.style.display !== 'none'); if (f) f.click(); } };
+}
 const deliveryAreas = () => (Array.isArray(S.settings && S.settings.delivery_areas) ? S.settings.delivery_areas : []).filter(a => a && a.name);
 function cartCalc(c) {
   const sub = c.items.reduce((s, i) => s + (i.base + i.addons.reduce((a, x) => a + x.price, 0)) * i.qty, 0);
@@ -2154,6 +2165,7 @@ VIEWS.pos = {
     this.paintLines(); this.paintFooter(calc);
     if (!c.addTo) {
       $$('#cart-src .chip').forEach(b => b.onclick = () => { c.source = b.dataset.src; c.fulfillment = SRC_FUL[c.source]; if (c.source !== 'qr') c.table_id = c.table_id; this.paintCart(); });
+      wireAreaSearch($('#cart-area-q'), '#cart-area .chip');
       $$('#cart-area .chip').forEach(b => b.onclick = () => {
         const ar = deliveryAreas()[+b.dataset.area];
         if (!ar || c.deliveryArea === ar.name) { c.deliveryArea = null; c.deliveryFee = null; } else { c.deliveryArea = ar.name; c.deliveryFee = num(ar.charge); }
@@ -2230,17 +2242,18 @@ VIEWS.pos = {
   },
   areaChips(c) {
     const ar = deliveryAreas(); if (!ar.length) return '';
-    return `<div class="chips" id="cart-area" title="${t('Delivery area')}">${ar.map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-area="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>`;
+    return areaSearchHTML('cart-area-q') + `<div class="chips" id="cart-area" title="${t('Delivery area')}">${ar.map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-area="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>`;
   },
   deliveryModal(calc) {
     const c = S.cart;
     const w = Modal.open({
       title: t('Delivery Charges'), html: `
-      ${deliveryAreas().length ? `<div class="chips" id="del-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
+      ${areaSearchHTML('del-area-q')}${deliveryAreas().length ? `<div class="chips" id="del-areas">${deliveryAreas().map((a, i) => `<button type="button" class="chip ${c.deliveryArea === a.name ? 'on' : ''}" data-i="${i}">📍 ${esc(a.name)} · ${money(a.charge)}</button>`).join('')}</div>` : ''}
       <label class="f">${t('Delivery amount (Rs.)')}<input id="del-v" type="number" min="0" value="${c.deliveryFee ?? calc.delivery}"></label>
       <p class="sm muted">${t('Delivery charges vary by area/distance — enter the correct amount for this order.')}</p>
       <div class="row"><button class="btn sm ghost" id="del-reset" type="button">${t('Use default')}</button><button class="btn primary lg" id="del-go">${t('Apply')}</button></div>`
     });
+    wireAreaSearch($('#del-area-q', w), '#del-areas .chip', w);
     $$('#del-areas .chip', w).forEach(b => b.onclick = () => { const a = deliveryAreas()[+b.dataset.i]; c.deliveryArea = a.name; $('#del-v', w).value = num(a.charge); $$('#del-areas .chip', w).forEach(x => x.classList.toggle('on', x === b)); });
     $('#del-reset', w).onclick = () => { c.deliveryFee = null; c.deliveryArea = null; Modal.close(w); this.paintCart(); };
     $('#del-go', w).onclick = () => { c.deliveryFee = num($('#del-v', w).value); const a = deliveryAreas().find(x => x.name === c.deliveryArea); if (a && num(a.charge) !== c.deliveryFee) c.deliveryArea = null; Modal.close(w); this.paintCart(); };
@@ -2441,6 +2454,7 @@ function orderListView(id, title, filterFn) {
           <select id="ol-status"><option value="">${t('All statuses')}</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>
           ${id === 'orders' ? `<select id="ol-src"><option value="">${t('All sources')}</option>${Object.entries(SRC).map(([k, v]) => `<option value="${k}">${t(v)}</option>`).join('')}</select>` : ''}
         </div>
+        <div class="sm muted" id="ol-count" style="margin:4px 2px"></div>
         <div class="ogrid" id="ol-grid"><div class="empty">${t('Loading')}…</div></div>`;
       $('#ol-range').value = this.f.range; $('#ol-status').value = this.f.status; if ($('#ol-src')) $('#ol-src').value = this.f.src;
       $('#ol-q').oninput = debounce(e => { this.f.q = e.target.value; this.load(); }, 300);
@@ -2477,6 +2491,7 @@ function orderListView(id, title, filterFn) {
         this.rows.push(...fr); got += fr.length;
       }
       const g2 = $('#ol-grid'); if (!g2) return;
+      const cnt = $('#ol-count'); if (cnt) cnt.textContent = `${this.rows.length} ${t('orders')}${this.done ? '' : '+'}`;
       g2.innerHTML = this.rows.length ? this.rows.map(o => orderCard(o, { delivery: o.fulfillment === 'delivery' })).join('') + (this.done ? '' : `<div class="full" style="grid-column:1/-1;text-align:center"><button class="btn lg" id="ol-more">⬇ ${t('Load more')}</button></div>`) : `<div class="empty">${t('No orders found')}</div>`;
       const mb = $('#ol-more'); if (mb) mb.onclick = ev => { ev.currentTarget.disabled = true; this.load(true); };
     }
